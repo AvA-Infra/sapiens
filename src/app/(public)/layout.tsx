@@ -1,6 +1,7 @@
 import { CookieBanner } from "@/components/layout/CookieBanner";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
+import { WhatsAppFab } from "@/components/WhatsAppFab";
 import { GlassFilter } from "@/components/ui/liquid-glass-button";
 
 /**
@@ -24,6 +25,7 @@ export default function PublicLayout({ children }: LayoutProps<"/">) {
         {children}
       </main>
       <Footer />
+      <WhatsAppFab />
       <CookieBanner />
     </div>
   );

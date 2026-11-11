@@ -21,7 +21,7 @@ export function CountUp({ to, suffix = "" }: { to: number | null; suffix?: strin
   }, [to, inView, reduce]);
 
   if (to === null) {
-    return <span className="text-base font-semibold text-sky-600">[PREENCHER]</span>;
+    return <span className="font-sans text-base font-semibold text-sky-400">[PREENCHER]</span>;
   }
   return (
     <span ref={ref} className="tabular-nums">
