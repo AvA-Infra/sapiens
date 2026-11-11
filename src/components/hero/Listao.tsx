@@ -27,16 +27,18 @@ export function Listao({ items, total }: { items: Approved[]; total: number }) {
         <p className="text-sm font-semibold text-ink-soft">{total} aprovações publicadas</p>
       </div>
       <div
-        className="listao relative h-[19rem] overflow-hidden sm:h-[24rem] [mask-image:linear-gradient(#000_82%,transparent)]"
+        className="listao relative h-[19rem] overflow-hidden sm:h-[24rem]"
         tabIndex={0}
         role="group"
         aria-label={`Aprovações mais recentes, de um total de ${total}`}
         style={{ "--listao-duration": `${items.length * 2.2}s` } as CSSProperties}
       >
-        <div className="listao-track">
+        <div className="listao-track will-change-transform">
           <ul>{rows(false)}</ul>
           <ul aria-hidden>{rows(true)}</ul>
         </div>
+        {/* Esmaece o fim da lista. Um degradê por cima custa menos que uma máscara sobre conteúdo animado. */}
+        <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-surface to-transparent" />
       </div>
     </div>
   );
