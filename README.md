@@ -2,7 +2,7 @@
 
 Site e plataforma de aulas do curso SAPIENS (Campos dos Goytacazes - RJ): páginas públicas, área do aluno com player de aulas, painel do professor e painel admin.
 
-**Stack:** Next.js 16 (App Router, Cache Components) · TypeScript · Tailwind CSS v4 · Framer Motion · Supabase (Auth, Postgres, Storage) · Zod · Lucide.
+**Stack:** Next.js 16 (App Router, Cache Components) · TypeScript · Tailwind CSS v4 · Framer Motion · Supabase (Auth, Postgres, Storage) · Zod · Lucide · Markdown (blog) · API do Claude (assistente, opcional).
 
 ## Rodar localmente
 
@@ -47,6 +47,7 @@ Nunca commite o `.env.local`. O `.env.example` fica **sem valores**.
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY` | público / servidor | Anti-robô do formulário de contato (opcional; sem elas só o honeypot e o tempo mínimo agem) |
 | `VIDEO_PROVIDER`, `BUNNY_STREAM_LIBRARY_ID`, `BUNNY_STREAM_TOKEN_KEY` | só servidor | URLs assinadas e expiráveis do Bunny Stream |
 | `PAYMENT_PROVIDER`, `PAYMENT_WEBHOOK_SECRET` | só servidor | Pagamentos (ainda não ativos) |
+| `ANTHROPIC_API_KEY`, `ASSISTANT_MODEL` | só servidor | Assistente virtual com IA (opcional; veja abaixo) |
 
 ## Conteúdo editável
 
@@ -55,8 +56,45 @@ Tudo que falta informar está marcado com `[PREENCHER]`.
 - `src/config/site.ts`: telefone, endereço, **horários**, e-mail, anos de curso.
 - `src/config/content.ts`: professores, turmas, depoimentos, fotos do espaço.
 - `src/config/plans.ts`: planos e preços da aba **Planos** (hoje são **exemplos fictícios**; a página fica `noindex` até a escola definir os reais).
-- `src/config/approved-data.ts`: aprovações (geradas do Instagram da escola; revise antes de publicar).
+- `src/config/approved-data.ts`: aprovações (geradas do Instagram da escola; revise antes de publicar). Os números da home, o listão do topo e os cartões de área são calculados a partir desta lista.
+- `src/config/faq.ts`: perguntas frequentes. Pergunta com `answer: null` aparece no site apontando para o WhatsApp; ao preencher a resposta ela passa a valer também para o Google e para o assistente.
+- `content/blog/*.md`: artigos do blog (passo a passo em `content/blog/LEIA-ME.md`).
 - `docs/brand.md`: identidade visual (cores, tema claro/escuro, fontes, logo, navegação, tom de voz).
+
+### O que ainda falta a escola informar
+
+Cada item abaixo já tem lugar pronto no site; é só preencher o arquivo indicado.
+
+| O que | Onde |
+|---|---|
+| Turmas, horários e valores | `src/config/content.ts` (`classes`) |
+| Professores (nome, matéria, bio, foto em `public/equipe`) | `src/config/content.ts` (`teachers`) |
+| Depoimentos autorizados | `src/config/content.ts` (`testimonials`) |
+| Fotos do espaço (em `public/estrutura`) | `src/config/content.ts` (`spacePhotos`) |
+| Horário de atendimento, e-mail, anos de curso | `src/config/site.ts` |
+| História e missão | `src/app/(public)/sobre/page.tsx` |
+| Planos e preços reais | `src/config/plans.ts` |
+| Respostas sobre horários, valores, aula experimental e bolsas | `src/config/faq.ts` |
+| Razão social, CNPJ e encarregado de dados | `src/app/(public)/privacidade/page.tsx` |
+
+## Blog
+
+Os artigos são arquivos Markdown em `content/blog`. Para publicar: crie um `.md` com o cabeçalho (título, resumo, data, assunto), confira em `/blog` e dê push. O guia completo está em `content/blog/LEIA-ME.md`. Os três artigos iniciais foram redigidos como ponto de partida: **peça para um professor revisar** antes de divulgar.
+
+## Assistente virtual (IA, opcional)
+
+Um botão de chat no site público responde dúvidas simples e encaminha para o WhatsApp. Ele usa a API do Claude e **só aparece quando `ANTHROPIC_API_KEY` está configurada**.
+
+- **O que ele sabe:** apenas o que está em `src/config` (endereço, contatos, aprovações, perguntas respondidas, turmas e horários quando preenchidos). Para o resto, manda a pessoa para o WhatsApp. O texto de instruções fica em `src/lib/assistant/knowledge.ts`.
+- **Como ligar:** crie uma conta em [platform.claude.com](https://platform.claude.com), gere uma chave em *Settings > API keys*, adicione créditos e cadastre `ANTHROPIC_API_KEY` na Vercel (Production). Defina um **limite de gasto mensal** no painel da Anthropic.
+- **Modelo e custo:** o padrão é `claude-opus-5-5` (US$ 4 por milhão de tokens de entrada e US$ 20 de saída). Uma conversa típica de três perguntas custa na faixa de US$ 0,05. Com `ASSISTANT_MODEL=claude-haiku-5-5` (US$ 0,10 e US$ 0,50) a mesma conversa custa menos de US$ 0,01, e para perguntas simples de FAQ costuma bastar. São estimativas: acompanhe o uso real no painel.
+- **Proteções:** 20 mensagens por IP a cada 10 minutos, no máximo 6 perguntas por conversa, mensagens de até 600 caracteres e respostas curtas. Em produção o limite por IP depende do Upstash (`UPSTASH_REDIS_REST_*`).
+- **Privacidade:** a conversa não é salva pelo site; as perguntas são enviadas à Anthropic para gerar a resposta (está na política de privacidade).
+
+## Cookies e estatísticas
+
+- O aviso de cookies oferece "Permitir tudo" e "Só o essencial". O mapa do Google só carrega com permissão ou clique; as publicações do Instagram só carregam com clique. A escolha pode ser revista em "Preferências de cookies", no rodapé.
+- As estatísticas de visita usam o Vercel Web Analytics (sem cookies). Ative em *Analytics* no painel do projeto na Vercel; fora da Vercel o componente não é carregado.
 
 ## Banco de dados (Supabase)
 
@@ -118,11 +156,12 @@ As tabelas `products` e `orders` existem. A interface `PaymentProvider` (`src/li
 src/
   app/(public)/         site público: navbar flutuante no topo, fundo branco, rodapé
   app/(app)/            áreas logadas (aluno, professor, admin): sidebar fixa à esquerda
-  app/api/              contato, checkout (stub), webhooks/payment (stub)
+  app/api/              contato, assistente (IA), checkout (stub), webhooks/payment (stub)
   components/           brand, hero, layout, player, panel, ui
-  config/               site, content, approved-data, nav
+  config/               site, content, approved-data, faq, plans, nav
   lib/                  auth, supabase, video, payments, ratelimit, schemas, ações do servidor
   proxy.ts              sessão e proteção de rotas
+content/blog/           artigos do blog em Markdown
 supabase/               migrations e seed
 docs/brand.md           guia de marca
 ```

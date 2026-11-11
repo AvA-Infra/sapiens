@@ -35,6 +35,7 @@ export default function PrivacidadePage() {
             <li><strong>Instagram (Meta):</strong> a página “Quem cursa, aprova” permite abrir as publicações originais da escola. Cada publicação só é carregada quando você clica em “Ver a publicação”; a partir daí o Instagram pode definir cookies e coletar dados de navegação, conforme a política da própria Meta.</li>
             <li><strong>Google Maps:</strong> mapas nas páginas de contato e estrutura. O mapa só é carregado se você permitir conteúdos de terceiros no aviso de cookies ou clicar em “Carregar mapa”; a partir daí vale a política do Google.</li>
             <li><strong>WhatsApp (Meta):</strong> os botões de WhatsApp e o agendamento de visita apenas abrem uma conversa no aplicativo com uma mensagem pronta. O site não envia nem guarda o que você escreve lá.</li>
+            <li><strong>Anthropic (assistente virtual):</strong> quando o assistente de dúvidas está ativo, as perguntas que você escreve nele são enviadas à Anthropic, que gera as respostas. O site não guarda a conversa; não escreva dados pessoais ou sensíveis no assistente.</li>
             <li><strong>Vercel:</strong> hospedagem do site e estatísticas de visita anônimas (veja abaixo).</li>
           </ul>
 
