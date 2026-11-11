@@ -1,0 +1,187 @@
+@import "tailwindcss";
+
+/* Tema escuro por classe no <html> (class="dark"), e não pela preferência do sistema. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+  Tokens da marca SAPIENS Biomédicas. Fonte da verdade: docs/brand.md
+
+  Tema CLARO (padrão): branco domina; azul-marinho e ciano só em destaques (títulos, botões, ícones, bordas).
+  Tema ESCURO: a MESMA paleta com o peso invertido. O par fundo/texto troca de lugar:
+    --paper  (fundo)  : branco  -> azul-marinho profundo
+    --navy-900 (texto/botão forte): azul-marinho -> quase branco
+  Por isso `bg-paper` + `text-navy-900` funciona nos dois temas sem mudar o componente.
+*/
+:root {
+  --navy-950: #000d33;
+  --navy-900: #001650; /* títulos e botões fortes */
+  --navy-800: #032a6b;
+  --navy-700: #044e95; /* hover do botão forte */
+
+  --sky-600: #0a68a8; /* texto de destaque sobre branco: contraste 5,6:1 (AA) */
+  --sky-500: #1b9be0; /* ícones e bordas de destaque */
+  --sky-400: #4fd8ff; /* ciano neon da logo */
+  --sky-200: #b5f3ff;
+  --sky-100: #dff8ff; /* chips e fundos de destaque suaves */
+  --sky-50: #f0fcff; /* faixas de seção suaves */
+
+  --paper: #ffffff; /* fundo principal */
+  --ink: #0b1a33; /* texto de leitura */
+  --ink-soft: #425576; /* texto secundário: 7:1 sobre branco */
+  --line: #d3e6f2; /* bordas */
+
+  /* Cor (r g b) dos desenhos em canvas do hero: rede neural */
+  --net-rgb: 4 78 149;
+
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --ring: var(--sky-500);
+  color-scheme: light;
+}
+
+.dark {
+  --navy-950: #000d33;
+  --navy-900: #f2f8ff;
+  --navy-800: #e4f1ff;
+  --navy-700: #bcdcff;
+
+  --sky-600: #4fd8ff;
+  --sky-500: #5ac8ff;
+  --sky-400: #4fd8ff;
+  --sky-200: #b5f3ff;
+  --sky-100: #0f2a63;
+  --sky-50: #0a1f4d;
+
+  --paper: #050f2c;
+  --ink: #e6eefc;
+  --ink-soft: #a9bde0;
+  --line: #1c3270;
+
+  --net-rgb: 181 243 255;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-navy-950: var(--navy-950);
+  --color-navy-900: var(--navy-900);
+  --color-navy-800: var(--navy-800);
+  --color-navy-700: var(--navy-700);
+  --color-sky-600: var(--sky-600);
+  --color-sky-500: var(--sky-500);
+  --color-sky-400: var(--sky-400);
+  --color-sky-200: var(--sky-200);
+  --color-sky-100: var(--sky-100);
+  --color-sky-50: var(--sky-50);
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-line: var(--line);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --font-display: var(--font-display-face), ui-rounded, system-ui, sans-serif;
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+
+  --radius-card: 18px;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  letter-spacing: 0;
+  line-height: 1.1;
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+:focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+::selection {
+  background: var(--sky-400);
+  color: #000d33;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ---------- Movimento ---------- */
+
+/* Flutuação suave do cérebro. Com prefers-reduced-motion a regra global acima congela a animação. */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.animate-float {
+  animation: float 5s ease-in-out infinite;
+}
+
+/* Entrada do hero em CSS puro: aparece sem esperar o JavaScript (melhora o LCP). */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(var(--rise-y, 14px)); }
+  to { opacity: 1; transform: none; }
+}
+.rise {
+  animation: rise 0.7s var(--ease-out-expo) both;
+  animation-delay: var(--d, 0s);
+}
+
+/* Transição entre páginas (template.tsx): entrada curta e discreta. */
+@keyframes page-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+.page-in {
+  animation: page-in 0.35s var(--ease-out-expo) both;
+}
+
+/* Cartões e botões que reagem ao mouse. */
+.lift {
+  transition: transform 0.25s var(--ease-out-expo), box-shadow 0.25s var(--ease-out-expo), border-color 0.2s;
+}
+@media (hover: hover) {
+  .lift:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 30px -12px rgb(0 22 80 / 0.25);
+  }
+}
+
+/* Vidro líquido: base de desfoque para navegadores sem suporte a backdrop-filter com filtro SVG
+   (Safari, Firefox). Onde há suporte, o estilo inline com url(#container-glass) substitui esta regra. */
+.glass-blur {
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
