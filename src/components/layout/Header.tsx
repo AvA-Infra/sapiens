@@ -152,7 +152,7 @@ export function Header() {
             "pointer-events-auto flex w-full max-w-[78rem] items-center justify-between gap-3 rounded-full border border-line backdrop-blur-xl",
             "transition-[height,padding,background-color,box-shadow] duration-300 ease-out",
             compact
-              ? "h-12 bg-paper/70 pl-3 pr-2 shadow-md shadow-navy-900/10"
+              ? "h-12 bg-paper/85 pl-3 pr-2 shadow-md shadow-navy-900/10"
               : "h-[4.25rem] bg-paper/95 pl-5 pr-3 shadow-lg shadow-navy-900/10",
           )}
         >
@@ -169,9 +169,13 @@ export function Header() {
 
           <div className="flex items-center gap-2">
             <ThemeToggle className={cn("transition-all duration-300", compact && "size-9 min-h-9")} />
-            <Button href="/aluno" prefetch={false} size="sm" className="hidden sm:inline-flex">
-              <LogIn className="size-4" aria-hidden /> Área do aluno
-            </Button>
+            {/* No celular o botão fica só na gaveta do menu. O wrapper esconde de verdade
+                (a classe "hidden" direto no Button perde para o "inline-flex" dele). */}
+            <span className="hidden sm:block">
+              <Button href="/aluno" prefetch={false} size="sm" className="whitespace-nowrap">
+                <LogIn className="size-4" aria-hidden /> Área do aluno
+              </Button>
+            </span>
             <button
               ref={openerRef}
               type="button"

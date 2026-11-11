@@ -9,8 +9,8 @@ function initials(name: string) {
 
 export function TeacherCard({ teacher }: { teacher: Teacher }) {
   return (
-    <article className="flex gap-5">
-      <div className="relative size-24 shrink-0 overflow-hidden rounded-full bg-sky-100 sm:size-28">
+    <article className="reveal flex h-full gap-5 rounded-card border border-line bg-surface p-6 shadow-card">
+      <div className="relative size-20 shrink-0 overflow-hidden rounded-full bg-sky-100 sm:size-24">
         {teacher.photo ? (
           <Image src={teacher.photo} alt={`Foto de ${teacher.name}`} fill sizes="112px" className="object-cover" />
         ) : (
@@ -20,8 +20,8 @@ export function TeacherCard({ teacher }: { teacher: Teacher }) {
         )}
       </div>
       <div>
-        <h3 className="text-xl font-bold text-navy-900">{teacher.name}</h3>
-        <p className="text-sm font-semibold uppercase tracking-wide text-sky-600">{teacher.subject}</p>
+        <h3 className="text-2xl font-bold text-navy-900">{teacher.name}</h3>
+        <p className="text-sm font-semibold text-sky-600">{teacher.subject}</p>
         <p className="mt-2 text-ink-soft">{teacher.bio}</p>
       </div>
     </article>
