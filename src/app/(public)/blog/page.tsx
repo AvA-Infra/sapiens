@@ -1,0 +1,78 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
+import { BreadcrumbJsonLd } from "@/components/JsonLd";
+import { PageHeader, Pending, Section } from "@/components/ui/Section";
+import { formatDate, getPosts } from "@/lib/blog";
+
+export const metadata: Metadata = {
+  title: "Blog",
+  description:
+    "Artigos da Sapiens sobre ENEM, redação e preparação para Medicina: como a prova funciona e como organizar os estudos.",
+  alternates: { canonical: "/blog" },
+};
+
+export default function BlogPage() {
+  const posts = getPosts();
+  const [first, ...rest] = posts;
+
+  return (
+    <>
+      <BreadcrumbJsonLd items={[{ name: "Blog", path: "/blog" }]} />
+      <PageHeader
+        eyebrow="Blog"
+        title="Para estudar sabendo como a prova funciona."
+        intro="Guias diretos sobre ENEM, redação e a rotina de quem quer Medicina."
+      />
+      <Section>
+        {!first ? (
+          <Pending>
+            Nenhum artigo publicado. Crie um arquivo <code>.md</code> em <code>content/blog</code> (veja o LEIA-ME da pasta).
+          </Pending>
+        ) : (
+          <>
+            <Link
+              href={`/blog/${first.slug}`}
+              className="lift group grid gap-6 rounded-card border border-sky-400/70 bg-surface p-7 shadow-pop sm:p-10 lg:grid-cols-[1.4fr_1fr] lg:items-end"
+            >
+              <div>
+                <p className="text-sm font-semibold text-sky-600">
+                  {first.topic}, {formatDate(first.date)}
+                </p>
+                <h2 className="mt-3 text-4xl font-bold text-navy-900 sm:text-6xl">{first.title}</h2>
+              </div>
+              <div>
+                <p className="text-lg text-ink-soft">{first.description}</p>
+                <span className="mt-5 inline-flex items-center gap-2 font-semibold text-sky-600 group-hover:text-navy-900">
+                  Ler em {first.minutes} min <ArrowRight className="nudge size-4" aria-hidden />
+                </span>
+              </div>
+            </Link>
+
+            {rest.length > 0 && (
+              <ul className="mt-5 grid gap-5 md:grid-cols-2">
+                {rest.map((p) => (
+                  <li key={p.slug} className="reveal">
+                    <Link
+                      href={`/blog/${p.slug}`}
+                      className="lift group flex h-full flex-col rounded-card border border-line bg-surface p-7 shadow-card hover:border-sky-500"
+                    >
+                      <p className="text-sm font-semibold text-sky-600">
+                        {p.topic}, {formatDate(p.date)}
+                      </p>
+                      <h2 className="mt-3 text-3xl font-bold text-navy-900 sm:text-4xl">{p.title}</h2>
+                      <p className="mt-3 text-ink-soft">{p.description}</p>
+                      <span className="mt-auto inline-flex items-center gap-2 pt-6 font-semibold text-sky-600 group-hover:text-navy-900">
+                        Ler em {p.minutes} min <ArrowRight className="nudge size-4" aria-hidden />
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </>
+        )}
+      </Section>
+    </>
+  );
+}
