@@ -1,6 +1,14 @@
-import type { ReactNode } from "react";
+import { ViewTransition, type ReactNode } from "react";
 
-/** O template é recriado a cada navegação: dá uma entrada curta e discreta a cada página nova. */
+/**
+ * O template é recriado a cada navegação. O <ViewTransition> usa a View Transitions API do navegador
+ * para trocar a página antiga pela nova com um fade curto (classe `.page` em globals.css).
+ * Sem suporte no navegador, a troca é instantânea.
+ */
 export default function Template({ children }: { children: ReactNode }) {
-  return <div className="page-in">{children}</div>;
+  return (
+    <ViewTransition enter="page" exit="page" default="none">
+      <div>{children}</div>
+    </ViewTransition>
+  );
 }

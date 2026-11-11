@@ -1,12 +1,13 @@
 import type { Metadata, Viewport } from "next";
-import { Baloo_2, Figtree } from "next/font/google";
+import { Barlow_Condensed, Figtree } from "next/font/google";
 import { JsonLd } from "@/components/JsonLd";
-import { THEME_STORAGE_KEY } from "@/components/theme/theme";
+import { themeScript } from "@/components/theme/theme";
 import { site } from "@/config/site";
 import "./globals.css";
 
-// Títulos arredondados e acolhedores (Baloo 2) + texto de leitura limpo (Figtree).
-const display = Baloo_2({
+// Títulos em Barlow Condensed: grotesca estreita, na mesma linha do "SAPIENS" da logo oficial.
+// Texto de leitura em Figtree.
+const display = Barlow_Condensed({
   variable: "--font-display-face",
   subsets: ["latin"],
   weight: ["500", "600", "700"],
@@ -39,12 +40,6 @@ export const viewport: Viewport = {
     { media: "(prefers-color-scheme: dark)", color: "#050f2c" },
   ],
 };
-
-/**
- * Aplica o tema salvo ANTES da primeira pintura (evita o "flash" do tema errado).
- * Padrão: claro. Só lê o localStorage; qualquer erro cai no claro.
- */
-const themeScript = `(function(){try{var t=localStorage.getItem(${JSON.stringify(THEME_STORAGE_KEY)});if(t==="dark")document.documentElement.classList.add("dark");}catch(e){}})();`;
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (

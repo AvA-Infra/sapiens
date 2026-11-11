@@ -143,7 +143,10 @@ export function Header() {
 
   return (
     <>
-      <header className="pointer-events-none fixed inset-x-0 top-0 z-50 flex justify-center px-3 pt-3 sm:px-4">
+      <header
+        className="pointer-events-none fixed inset-x-0 top-0 z-50 flex justify-center px-3 pt-3 sm:px-4"
+        style={{ viewTransitionName: "site-header" }}
+      >
         <div
           className={cn(
             "pointer-events-auto flex w-full max-w-[78rem] items-center justify-between gap-3 rounded-full border border-line backdrop-blur-xl",
