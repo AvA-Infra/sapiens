@@ -2,10 +2,12 @@ import type { Metadata } from "next";
 import { MapPin, MessageCircle, Phone } from "lucide-react";
 import { InstagramIcon } from "@/components/brand/InstagramIcon";
 import { ContactForm } from "@/components/ContactForm";
+import { MapEmbed } from "@/components/MapEmbed";
 import { PageHeader, Section } from "@/components/ui/Section";
 import { mapsLink, site, whatsappLink } from "@/config/site";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/contato" },
   title: "Contato e localização",
   description: "Fale com a Sapiens por WhatsApp, telefone, Instagram ou formulário. Av. Vinte e Oito de Março, 574, Campos dos Goytacazes.",
 };
@@ -51,13 +53,7 @@ export default function ContatoPage() {
           <ContactForm />
         </div>
 
-        <iframe
-          title="Mapa: Sapiens Biomédicas"
-          src={`https://maps.google.com/maps?q=${encodeURIComponent(`${address.street}, ${address.city} - ${address.state}`)}&output=embed`}
-          loading="lazy"
-          referrerPolicy="no-referrer-when-downgrade"
-          className="mt-16 h-80 w-full rounded-card border border-line sm:h-96"
-        />
+        <MapEmbed className="mt-16 h-80 sm:h-96" />
       </Section>
     </>
   );
