@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Barlow_Condensed, Figtree } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { JsonLd } from "@/components/JsonLd";
 import { themeScript } from "@/components/theme/theme";
 import { site } from "@/config/site";
@@ -27,11 +28,25 @@ export const metadata: Metadata = {
     template: `%s | ${site.name}`,
   },
   description: site.description,
+  applicationName: site.name,
+  keywords: [
+    "pré-vestibular Campos dos Goytacazes",
+    "curso preparatório Medicina Campos",
+    "cursinho ENEM Campos dos Goytacazes",
+    "Sapiens Biomédicas",
+    "curso de Biomédicas",
+  ],
+  alternates: { canonical: "/" },
+  formatDetection: { telephone: false },
   openGraph: {
     type: "website",
     locale: "pt_BR",
     siteName: site.name,
+    url: "/",
   },
+  // Prévia grande ao compartilhar (WhatsApp, LinkedIn, X). A imagem vem de src/app/opengraph-image.jpg.
+  twitter: { card: "summary_large_image" },
+  robots: { index: true, follow: true, googleBot: { "max-image-preview": "large", "max-snippet": -1 } },
 };
 
 export const viewport: Viewport = {
@@ -51,6 +66,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-dvh flex-col">
         <JsonLd />
         {children}
+        {/* Estatísticas de visita sem cookies e sem identificar a pessoa. Só existe no deploy da Vercel. */}
+        {process.env.VERCEL ? <Analytics /> : null}
       </body>
     </html>
   );
