@@ -23,13 +23,13 @@
   --sky-500: #1b9be0; /* ícones e bordas de destaque */
   --sky-400: #4fd8ff; /* ciano neon da logo */
   --sky-200: #b5f3ff;
-  --sky-100: #dff8ff; /* chips e fundos de destaque suaves */
-  --sky-50: #f0fcff; /* faixas de seção suaves */
+  --sky-100: #d2eefb; /* chips e fundos de destaque suaves */
+  --sky-50: #e9f4fb; /* faixas de seção suaves */
 
   --paper: #ffffff; /* fundo principal */
   --ink: #0b1a33; /* texto de leitura */
-  --ink-soft: #425576; /* texto secundário: 7:1 sobre branco */
-  --line: #d3e6f2; /* bordas */
+  --ink-soft: #384a69; /* texto secundário: 8,7:1 sobre branco */
+  --line: #c2d8e9; /* bordas */
 
   /* Cor (r g b) dos desenhos em canvas do hero: rede neural */
   --net-rgb: 4 78 149;
@@ -43,8 +43,8 @@
 
   /* Sombras em duas camadas, tingidas de azul-marinho (nunca cinza neutro). */
   --shadow-rgb: 0 22 80;
-  --elev-card: 0 1px 2px rgb(var(--shadow-rgb) / 0.06), 0 10px 28px -14px rgb(var(--shadow-rgb) / 0.18);
-  --elev-pop: 0 2px 4px rgb(var(--shadow-rgb) / 0.06), 0 24px 48px -20px rgb(var(--shadow-rgb) / 0.32);
+  --elev-card: 0 1px 2px rgb(var(--shadow-rgb) / 0.08), 0 12px 28px -14px rgb(var(--shadow-rgb) / 0.26);
+  --elev-pop: 0 2px 4px rgb(var(--shadow-rgb) / 0.08), 0 26px 50px -20px rgb(var(--shadow-rgb) / 0.4);
   --whatsapp: #0e7a3f; /* verde do WhatsApp escurecido: texto branco com contraste AA */
 
   --background: var(--paper);
@@ -55,27 +55,27 @@
 
 .dark {
   --navy-950: #000d33;
-  --navy-900: #f2f8ff;
-  --navy-800: #e4f1ff;
-  --navy-700: #bcdcff;
+  --navy-900: #ffffff;
+  --navy-800: #eef5ff;
+  --navy-700: #cfe4ff;
 
   --sky-600: #4fd8ff;
   --sky-500: #5ac8ff;
   --sky-400: #4fd8ff;
   --sky-200: #b5f3ff;
-  --sky-100: #0f2a63;
-  --sky-50: #0a1f4d;
+  --sky-100: #24407f;
+  --sky-50: #1a2f62;
 
-  --paper: #050f2c;
-  --ink: #e6eefc;
-  --ink-soft: #a9bde0;
-  --line: #1c3270;
+  --paper: #13244f;
+  --ink: #f1f5fd;
+  --ink-soft: #c3d1ec;
+  --line: #34508f;
 
   --net-rgb: 181 243 255;
 
-  --surface: #0a1a45;
-  --deep: #0c2562;
-  --deep-2: #123383;
+  --surface: #1d3369;
+  --deep: #0a1838;
+  --deep-2: #13244f;
   --shadow-rgb: 0 4 20;
   --elev-card: 0 1px 2px rgb(var(--shadow-rgb) / 0.4), 0 10px 28px -14px rgb(var(--shadow-rgb) / 0.7);
   --elev-pop: 0 2px 4px rgb(var(--shadow-rgb) / 0.4), 0 24px 48px -20px rgb(var(--shadow-rgb) / 0.8);
@@ -396,3 +396,18 @@ details.faq[open] .faq-icon {
 .prose th, .prose td { border-bottom: 1px solid var(--line); padding: 0.6em 0.75em 0.6em 0; text-align: left; }
 .prose th { color: var(--navy-900); }
 .prose hr { border-color: var(--line); margin-block: 2.5em; }
+
+/* ---------- Blocos sobre azul-marinho (faixa de números e rodapé) ----------
+   Dentro de .tone-deep os tokens de texto, destaque e borda ficam claros nos dois temas,
+   então os componentes de sempre (Logo, links, títulos) funcionam sem classes extras. */
+.tone-deep {
+  --navy-900: #ffffff;
+  --navy-700: #cfe4ff;
+  --ink: #eef3fd;
+  --ink-soft: #b4c9ea;
+  --sky-600: #6fdcff;
+  --sky-500: #5ac8ff;
+  --line: rgb(255 255 255 / 0.16);
+  background: var(--deep);
+  color: var(--ink);
+}

@@ -8,21 +8,22 @@ Branco é a cor dominante (fundo principal). Azul-escuro e azul-claro **nunca** 
 
 | Token | Claro | Escuro | Uso |
 |---|---|---|---|
-| `paper` | #ffffff | #050f2c | Fundo principal |
+| `paper` | #ffffff | #13244f | Fundo principal |
 | `navy-900` | #001650 | #f2f8ff | Títulos e botão forte (texto/botão) |
 | `navy-700` | #044e95 | #bcdcff | Hover do botão forte |
 | `sky-600` | #0a68a8 | #4fd8ff | Links e texto de destaque (AA) |
 | `sky-500` | #1b9be0 | #5ac8ff | Ícones, bordas de destaque |
 | `sky-400` | #4fd8ff | #4fd8ff | Ciano neon da logo (selos, foco) |
-| `sky-100` / `sky-50` | #dff8ff / #f0fcff | #0f2a63 / #0a1f4d | Chips e faixas suaves |
-| `ink` / `ink-soft` | #0b1a33 / #425576 | #e6eefc / #a9bde0 | Texto de leitura e secundário |
-| `line` | #d3e6f2 | #1c3270 | Bordas |
+| `sky-100` / `sky-50` | #d2eefb / #e9f4fb | #24407f / #1a2f62 | Chips e faixas suaves |
+| `ink` / `ink-soft` | #0b1a33 / #384a69 | #f1f5fd / #c3d1ec | Texto de leitura e secundário |
+| `line` | #c2d8e9 | #34508f | Bordas |
 
 ### Tema claro e escuro
 - Padrão: **segue o sistema operacional** (claro ou escuro). O botão sol/lua na navbar e na sidebar fixa uma escolha manual, guardada no `localStorage` (`sapiens-theme`). Tudo é aplicado por um script no `<head>`, antes da primeira pintura (sem "flash").
 - O tema escuro é a **mesma paleta com o peso invertido**: `paper` e `navy-900` trocam de lugar. Por isso `bg-paper` + `text-navy-900` e `bg-navy-900` + `text-paper` funcionam nos dois temas sem código extra. Use `dark:` apenas em exceções.
 - A classe `dark` fica no `<html>`, posta pelo script conforme o sistema ou a escolha manual.
-- **Exceção única ao "azul nunca preenche uma seção":** a faixa de números da home usa azul-marinho (`Section tone="deep"`, tokens `deep` / `on-deep`). Não repita em outras seções.
+- **Equilíbrio entre os temas (novembro de 2026):** o tema escuro usa um azul médio (não quase preto) e o claro ganhou faixas, bordas e sombras mais firmes, para os dois ficarem próximos em peso.
+- **Azul-marinho preenchendo bloco só em dois lugares:** a faixa de números da home (`Section tone="deep"`) e o rodapé (classe `.tone-deep`, que deixa textos e bordas claros nos dois temas). Não repita em outras seções.
 - Cartões usam `bg-surface` com `shadow-card` (repouso) ou `shadow-pop` (destaque). As sombras são tingidas de azul-marinho, nunca cinza.
 - Contraste AA verificado no tema claro (Lighthouse: acessibilidade 100). No escuro, os pares de tokens têm contraste acima de 9:1.
 

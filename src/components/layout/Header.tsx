@@ -152,8 +152,8 @@ export function Header() {
             "pointer-events-auto flex w-full max-w-[78rem] items-center justify-between gap-3 rounded-full border border-line backdrop-blur-xl",
             "transition-[height,padding,background-color,box-shadow] duration-300 ease-out",
             compact
-              ? "h-12 bg-paper/95 pl-3 pr-2 shadow-md shadow-navy-900/10"
-              : "h-[4.25rem] bg-paper/95 pl-5 pr-3 shadow-lg shadow-navy-900/10",
+              ? "h-12 bg-paper pl-3 pr-2 shadow-md shadow-navy-900/10"
+              : "h-[4.25rem] bg-paper pl-5 pr-3 shadow-lg shadow-navy-900/10",
           )}
         >
           <Link

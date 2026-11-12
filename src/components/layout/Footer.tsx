@@ -13,7 +13,7 @@ export function Footer() {
   const small = "min-h-11 inline-flex items-center hover:text-sky-600";
 
   return (
-    <footer className="border-t border-line bg-sky-50">
+    <footer className="tone-deep">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-2 lg:grid-cols-[1.3fr_0.8fr_0.8fr_1.3fr]">
         <div>
           <Logo size="md" />
