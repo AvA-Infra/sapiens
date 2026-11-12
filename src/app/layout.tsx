@@ -46,7 +46,9 @@ export const metadata: Metadata = {
   },
   // Prévia grande ao compartilhar (WhatsApp, LinkedIn, X). A imagem vem de src/app/opengraph-image.jpg.
   twitter: { card: "summary_large_image" },
-  robots: { index: true, follow: true, googleBot: { "max-image-preview": "large", "max-snippet": -1 } },
+  robots: site.indexable
+    ? { index: true, follow: true, googleBot: { "max-image-preview": "large", "max-snippet": -1 } }
+    : { index: false, follow: false },
 };
 
 export const viewport: Viewport = {

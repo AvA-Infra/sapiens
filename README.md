@@ -145,7 +145,7 @@ As tabelas `products` e `orders` existem. A interface `PaymentProvider` (`src/li
 
 1. Suba o projeto para um repositório e importe na Vercel (framework: Next.js).
 2. Cadastre as variáveis de ambiente (Production e Preview). `SUPABASE_SERVICE_ROLE_KEY` e demais segredos só como variáveis do servidor.
-3. Defina `NEXT_PUBLIC_SITE_URL` com o domínio final e configure o domínio.
+3. Defina `NEXT_PUBLIC_SITE_URL` com o domínio final e configure o domínio. **Enquanto essa variável não existir na Vercel, o site usa o endereço `*.vercel.app` e fica fora do Google (noindex)**, o que é o comportamento desejado para a fase de revisão.
 4. No Supabase, ajuste *Site URL* e *Redirect URLs*.
 5. Crie a conta da Upstash (plano gratuito basta) e defina `UPSTASH_REDIS_REST_*`.
 6. Antes de publicar: preencha os `[PREENCHER]`, revise privacidade/termos com um advogado e confirme a autorização para exibir nomes e fotos de alunos aprovados.
