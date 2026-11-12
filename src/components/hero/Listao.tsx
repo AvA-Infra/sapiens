@@ -21,8 +21,8 @@ export function Listao({ items, total }: { items: Approved[]; total: number }) {
     ));
 
   return (
-    <div className="overflow-hidden rounded-card border border-line bg-surface shadow-pop">
-      <div className="border-b border-line bg-sky-50 px-5 py-3.5 pr-32 sm:pr-40">
+    <div className="overflow-hidden rounded-card border border-line bg-surface shadow-card">
+      <div className="border-b-2 border-navy-900 px-5 py-3.5">
         <p className="font-display text-2xl font-bold leading-tight text-navy-900">Lista de aprovados</p>
         <p className="text-sm font-semibold text-ink-soft">{total} aprovações publicadas</p>
       </div>

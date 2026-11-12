@@ -111,7 +111,7 @@
   --font-display: var(--font-display-face), "Arial Narrow", system-ui, sans-serif;
   --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
 
-  --radius-card: 20px;
+  --radius-card: 10px;
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -203,8 +203,8 @@ p {
 }
 @media (hover: hover) {
   .lift:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 14px 30px -12px rgb(0 22 80 / 0.25);
+    transform: translateY(-2px);
+    box-shadow: var(--elev-card);
   }
 }
 
@@ -219,7 +219,7 @@ p {
    Só valem onde o navegador suporta animation-timeline e a pessoa não pediu menos movimento.
    Sem suporte (ou com movimento reduzido) o conteúdo simplesmente aparece no lugar. */
 @keyframes reveal-in {
-  from { opacity: 0; transform: translateY(28px); }
+  from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: none; }
 }
 @keyframes grow-x {
@@ -231,7 +231,7 @@ p {
     .reveal {
       animation: reveal-in linear both;
       animation-timeline: view();
-      animation-range: entry 0% entry 45%;
+      animation-range: entry 0% entry 25%;
     }
     /* Barra de progresso de leitura (artigos do blog): acompanha a rolagem da página. */
     .read-progress {

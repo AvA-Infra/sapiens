@@ -28,7 +28,7 @@ export function LogoMark({
   return (
     <span
       className={cn(
-        "inline-flex h-12 shrink-0 drop-shadow-[0_6px_14px_rgb(27_155_224/0.4)] dark:drop-shadow-[0_0_16px_rgb(79_216_255/0.5)]",
+        "inline-flex h-12 shrink-0 drop-shadow-[0_1px_3px_rgb(27_155_224/0.3)] dark:drop-shadow-[0_0_6px_rgb(79_216_255/0.35)]",
         float && "animate-float",
         className,
       )}
@@ -59,7 +59,7 @@ export function Logo({
   const s = sizes[size];
   return (
     <span className={cn("inline-flex items-center gap-3 text-navy-900", className)}>
-      <LogoMark float priority={priority} className={s.brain} />
+      <LogoMark priority={priority} className={s.brain} />
       <span className="flex flex-col leading-none">
         <span className={cn("font-display font-bold uppercase tracking-[0.04em]", s.name)}>Sapiens</span>
         <span className={cn("mt-1 font-semibold uppercase tracking-[0.18em] text-sky-600", s.tag)}>

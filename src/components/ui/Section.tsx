@@ -33,13 +33,10 @@ export function Section({
   );
 }
 
-/** Rótulo curto acima de um título: diz a que assunto a seção pertence. Caixa normal, sem tracking largo. */
+/** Nome da seção acima do título das páginas internas. Use só onde informa de fato (não em toda seção). */
 export function Eyebrow({ children }: { children: ReactNode }) {
   return (
-    <p className="mb-3 flex items-center gap-2.5 text-base font-semibold text-sky-600">
-      <span aria-hidden className="h-0.5 w-6 rounded-full bg-sky-400" />
-      {children}
-    </p>
+    <p className="mb-3 font-semibold text-sky-600">{children}</p>
   );
 }
 
@@ -52,14 +49,10 @@ export function SectionTitle({ id, children, className }: { id?: string; childre
   );
 }
 
-/** Cabeçalho padrão das páginas internas: branco, com um brilho ciano bem suave no canto. */
+/** Cabeçalho padrão das páginas internas: nome da seção, título grande e uma frase de apoio. */
 export function PageHeader({ eyebrow, title, intro }: { eyebrow: string; title: string; intro?: string }) {
   return (
-    <div className="relative isolate overflow-hidden border-b border-line bg-paper">
-      <div
-        aria-hidden
-        className="absolute -right-24 -top-32 -z-10 size-96 rounded-full bg-sky-400/20 blur-3xl dark:bg-sky-400/10"
-      />
+    <div className="border-b border-line bg-paper">
       <div className="mx-auto max-w-6xl px-4 pb-12 pt-10 sm:px-6 sm:pb-16 sm:pt-14">
         <Eyebrow>{eyebrow}</Eyebrow>
         <h1 className="max-w-4xl text-5xl font-bold text-navy-900 sm:text-6xl lg:text-7xl">{title}</h1>

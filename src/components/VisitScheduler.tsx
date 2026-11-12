@@ -15,7 +15,7 @@ function Choice({ active, onClick, children }: { active: boolean; onClick: () =>
       aria-pressed={active}
       onClick={onClick}
       className={cn(
-        "min-h-11 rounded-full border px-4 text-[0.95rem] font-semibold transition-[background-color,border-color,color,transform] duration-200 active:scale-95",
+        "min-h-11 rounded-[10px] border px-4 text-[0.95rem] font-semibold transition-colors duration-200",
         active
           ? "border-navy-900 bg-navy-900 text-paper"
           : "border-line bg-surface text-navy-900 hover:border-sky-500",
@@ -45,7 +45,7 @@ export function VisitScheduler() {
 
   return (
     <form
-      className="rounded-card border border-line bg-surface p-6 shadow-card sm:p-8"
+      className="rounded-card border border-line bg-surface p-6 sm:p-8"
       onSubmit={(e) => {
         e.preventDefault();
         if (ready) window.open(whatsappLink(message), "_blank", "noopener,noreferrer");
@@ -90,7 +90,7 @@ export function VisitScheduler() {
       <button
         type="submit"
         disabled={!ready}
-        className="mt-7 inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-full bg-whatsapp px-8 text-lg font-semibold text-white shadow-card transition-[transform,opacity,filter] duration-200 hover:-translate-y-0.5 hover:brightness-110 active:scale-[0.97] disabled:pointer-events-none disabled:opacity-50 dark:text-navy-950"
+        className="mt-7 inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-[10px] bg-whatsapp px-8 text-lg font-semibold text-white transition-[opacity,filter] duration-200 hover:brightness-110 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 dark:text-navy-950"
       >
         <CalendarCheck className="size-5" aria-hidden /> Pedir horário pelo WhatsApp
       </button>

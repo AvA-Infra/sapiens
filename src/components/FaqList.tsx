@@ -15,9 +15,9 @@ export function FaqList({ items }: { items: Faq[] }) {
             <h3 className="text-2xl font-semibold text-navy-900 sm:text-[1.7rem]">{f.question}</h3>
             <span
               aria-hidden
-              className="faq-icon grid size-10 shrink-0 place-items-center rounded-full border border-line text-sky-600"
+              className="faq-icon grid size-10 shrink-0 place-items-center text-sky-600"
             >
-              <Plus className="size-5" />
+              <Plus className="size-6" />
             </span>
           </summary>
           <div className="pb-6 pr-12 text-lg text-ink-soft">

@@ -40,12 +40,12 @@ Branco é a cor dominante (fundo principal). Azul-escuro e azul-claro **nunca** 
 - Largura mínima: cérebro 32 px; logo completa 150 px.
 
 ## Navegação
-- **Antes do login:** navbar flutuante no topo (cantos arredondados, com respiro das bordas). Encolhe ao rolar para baixo e volta ao normal ao rolar para cima ou no topo. Abaixo de 1280 px vira botão de menu com gaveta.
+- **Antes do login:** barra reta fixa no topo, com uma linha embaixo. O link da página atual fica sublinhado em ciano. Encolhe um pouco ao rolar para baixo. Abaixo de 1280 px vira botão de menu com gaveta.
 - **Depois do login** (`/aluno`, `/professor`, `/admin`): sidebar fixa colada à esquerda, reta, sempre visível a partir de 1024 px, com os links conforme o papel. Abaixo disso, barra fina com gaveta.
 
 ## Botões e movimento
-- Botões grandes (mínimo de 48 px), com ícone, e microanimação de hover e clique. O botão principal do hero e dos planos usa o **vidro líquido** (`LiquidButton`); não use em mais lugares (o filtro é pesado).
-- Entrada ao rolar em CSS puro (`.reveal`, scroll-driven animations), hover elevando cartões e troca de página com a View Transitions API. Tudo respeita `prefers-reduced-motion`.
+- Botões grandes (mínimo de 48 px), retangulares com cantos de 10 px (não pílula). O **vidro líquido** (`LiquidButton`) ficou só na página de planos.
+- Movimento contido: troca de página com a View Transitions API, barra de progresso de leitura nos artigos e entrada ao rolar (`.reveal`) **só** nas linhas de áreas da home. Sem partículas, brilhos, contadores animados ou logo flutuando. Tudo respeita `prefers-reduced-motion`.
 - O WhatsApp usa o verde próprio (`bg-whatsapp`) só no botão flutuante e no agendamento de visita.
 
 ## Tom de voz
@@ -54,3 +54,14 @@ Direto, humano e específico: Medicina, nota de corte, redação, simulado, apro
 - Nunca prometer aprovação nem usar resultados que a escola não possa comprovar.
 - A comunidade LGBTQ+ é acolhida de forma natural e discreta (seção Sobre).
 - Português do Brasil, sem emojis como ícones.
+
+## Para o site não parecer um modelo pronto
+Regras adotadas em novembro de 2026. Antes de criar uma seção nova, confira:
+- **Linhas no lugar de cartões.** Listas (áreas, aprovados, artigos, professores, vantagens) são linhas separadas por fios. Caixa com borda só para o que é de fato um objeto: formulário, listão, cartão de aprovado, turma.
+- **Sem rótulo acima de cada título.** O nome da seção só aparece no topo das páginas internas.
+- **Links em texto sublinhado**, sem seta. Botão só para ação (WhatsApp, enviar, matricular).
+- **Números em frase**, não em grade de "número grande + legenda".
+- **Sem enfeite de fundo:** nada de brilho desfocado, degradê decorativo, rede de partículas ou vidro.
+- **Sombra só onde há elevação real** (listão, menus, avisos). Cartões comuns ficam planos.
+- **Texto específico:** nomes, lugares e números da escola. Se a frase serviria para qualquer cursinho, reescreva.
+- O que mais ajuda daqui em diante é **foto real**: fachada, salas, professores e alunos aprovados.

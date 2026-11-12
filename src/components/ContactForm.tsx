@@ -66,7 +66,7 @@ export function ContactForm() {
 
   if (status.kind === "ok") {
     return (
-      <div role="status" className="rounded-card border border-line bg-surface p-8 text-center shadow-card sm:p-10">
+      <div role="status" className="rounded-card border border-line bg-surface p-8 text-center sm:p-10">
         <span className="success-badge mx-auto grid size-20 place-items-center rounded-full bg-sky-100 text-sky-600">
           <svg viewBox="0 0 24 24" className="size-10" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
             <path className="success-check" d="M5 12.5l4.5 4.5L19 7.5" />
@@ -98,7 +98,7 @@ export function ContactForm() {
   });
 
   return (
-    <form onSubmit={onSubmit} noValidate className="space-y-5 rounded-card border border-line bg-surface p-6 shadow-card sm:p-8">
+    <form onSubmit={onSubmit} noValidate className="space-y-5 rounded-card border border-line bg-surface p-6 sm:p-8">
       <div>
         <label htmlFor="name" className="font-semibold text-navy-900">Nome</label>
         <input id="name" name="name" autoComplete="name" required className={field} {...aria("name")} />

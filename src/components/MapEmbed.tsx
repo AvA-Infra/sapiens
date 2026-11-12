@@ -41,7 +41,7 @@ export function MapEmbed({ className }: { className?: string }) {
           <button
             type="button"
             onClick={() => setClicked(true)}
-            className="min-h-11 rounded-full bg-navy-900 px-5 font-semibold text-paper transition-transform duration-200 hover:-translate-y-0.5 active:scale-95"
+            className="min-h-11 rounded-[10px] bg-navy-900 px-5 font-semibold text-paper hover:bg-navy-700"
           >
             Carregar mapa
           </button>
@@ -49,7 +49,7 @@ export function MapEmbed({ className }: { className?: string }) {
             href={mapsLink()}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex min-h-11 items-center gap-2 rounded-full border-2 border-navy-900/30 px-5 font-semibold text-navy-900 hover:border-navy-900"
+            className="inline-flex min-h-11 items-center gap-2 rounded-[10px] border-2 border-navy-900/30 px-5 font-semibold text-navy-900 hover:border-navy-900"
           >
             <Navigation className="size-4" aria-hidden /> Abrir no Google Maps
           </a>

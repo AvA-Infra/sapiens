@@ -30,8 +30,8 @@ function BarLinks({ pathname }: { pathname: string }) {
             href={item.href}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "rounded-full px-3 py-2 text-[0.95rem] font-semibold transition-colors",
-              active ? "bg-sky-100 text-navy-900" : "text-ink hover:bg-sky-50 hover:text-navy-900",
+              "px-2.5 py-2 text-[0.95rem] font-semibold underline-offset-8 transition-colors",
+              active ? "text-navy-900 underline decoration-sky-500 decoration-2" : "text-ink hover:text-sky-600",
             )}
           >
             {item.label}
@@ -144,16 +144,16 @@ export function Header() {
   return (
     <>
       <header
-        className="pointer-events-none fixed inset-x-0 top-0 z-50 flex justify-center px-3 pt-3 sm:px-4"
+        className="fixed inset-x-0 top-0 z-50 border-b border-line bg-paper"
         style={{ viewTransitionName: "site-header" }}
       >
         <div
           className={cn(
-            "pointer-events-auto flex w-full max-w-[78rem] items-center justify-between gap-3 rounded-full border border-line backdrop-blur-xl",
-            "transition-[height,padding,background-color,box-shadow] duration-300 ease-out",
+            "mx-auto flex w-full max-w-6xl items-center justify-between gap-3 px-4 sm:px-6",
+            "transition-[height] duration-300 ease-out",
             compact
-              ? "h-12 bg-paper pl-3 pr-2 shadow-md shadow-navy-900/10"
-              : "h-[4.25rem] bg-paper pl-5 pr-3 shadow-lg shadow-navy-900/10",
+              ? "h-12"
+              : "h-16",
           )}
         >
           <Link
@@ -179,7 +179,7 @@ export function Header() {
             <button
               ref={openerRef}
               type="button"
-              className="grid size-11 place-items-center rounded-full border border-line text-navy-900 hover:bg-sky-100 xl:hidden"
+              className="grid size-11 place-items-center rounded-[10px] border border-line text-navy-900 hover:bg-sky-100 xl:hidden"
               aria-haspopup="dialog"
               aria-expanded={open}
               aria-controls="menu-lateral"
@@ -211,14 +211,14 @@ export function Header() {
               role="dialog"
               aria-modal="true"
               aria-label="Menu"
-              className="absolute inset-y-3 right-3 flex w-[min(88vw,22rem)] flex-col overflow-y-auto rounded-[2rem] border border-line bg-paper text-ink shadow-2xl"
+              className="absolute inset-y-0 right-0 flex w-[min(88vw,22rem)] flex-col overflow-y-auto border-l border-line bg-paper text-ink shadow-2xl"
               initial={reduce ? { opacity: 0 } : { x: "105%" }}
               animate={reduce ? { opacity: 1 } : { x: 0 }}
               exit={reduce ? { opacity: 0 } : { x: "105%" }}
               transition={{ duration: reduce ? 0 : 0.4, ease }}
             >
               <div className="flex h-[72px] shrink-0 items-center justify-between border-b border-line pl-6 pr-4">
-                <span className="text-sm font-bold uppercase tracking-[0.2em] text-sky-600">Menu</span>
+                <span className="font-display text-2xl font-bold text-navy-900">Menu</span>
                 <button
                   ref={closeRef}
                   type="button"

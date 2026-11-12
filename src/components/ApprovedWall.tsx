@@ -24,7 +24,7 @@ function Chip({ active, onClick, children }: { active: boolean; onClick: () => v
       aria-pressed={active}
       onClick={onClick}
       className={cn(
-        "min-h-11 rounded-full border px-4 text-sm font-semibold transition-[background-color,border-color,color,transform] duration-200 active:scale-95",
+        "min-h-11 rounded-[10px] border px-4 text-sm font-semibold transition-colors duration-200",
         active ? "border-navy-900 bg-navy-900 text-paper" : "border-line bg-surface text-navy-900 hover:border-sky-500",
       )}
     >
@@ -52,7 +52,7 @@ function ApprovedCard({ a }: { a: Approved }) {
   const ig = a.instagram;
 
   return (
-    <li className="flex flex-col rounded-card border border-line bg-surface p-5 shadow-card">
+    <li className="flex flex-col rounded-card border border-line bg-surface p-5">
       <div className="flex gap-4">
         {a.photo && (
           <Image src={a.photo} alt={`Foto de ${a.name}`} width={64} height={64} className="size-16 rounded-full object-cover" />
@@ -208,7 +208,7 @@ export function ApprovedWall({ items }: { items: Approved[] }) {
           <button
             type="button"
             onClick={() => setLimit((l) => l + PAGE)}
-            className="min-h-12 rounded-full border-2 border-navy-900/30 px-8 font-semibold text-navy-900 transition-transform duration-200 hover:-translate-y-0.5 hover:border-navy-900 active:scale-95"
+            className="min-h-12 rounded-[10px] border-2 border-navy-900/30 px-8 font-semibold text-navy-900 hover:border-navy-900"
           >
             Mostrar mais ({sorted.length - limit})
           </button>

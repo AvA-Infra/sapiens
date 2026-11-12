@@ -7,9 +7,9 @@ type Size = "default" | "sm" | "lg";
 
 // Botões grandes por padrão (alvo de toque de 48 px) e com microanimação de clique.
 const base =
-  "inline-flex items-center justify-center gap-2 rounded-full font-semibold " +
+  "inline-flex items-center justify-center gap-2 rounded-[10px] font-semibold " +
   "transition-[background-color,color,box-shadow,transform,border-color] duration-200 ease-out " +
-  "hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.97] disabled:pointer-events-none disabled:opacity-50";
+  "active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50";
 
 const sizes: Record<Size, string> = {
   sm: "min-h-11 px-5 text-[0.95rem]",
@@ -19,7 +19,7 @@ const sizes: Record<Size, string> = {
 
 // `bg-navy-900 text-paper` e `bg-paper text-navy-900` trocam de lugar sozinhos no tema escuro.
 const variants: Record<Variant, string> = {
-  primary: "bg-navy-900 text-paper shadow-md shadow-navy-900/15 hover:bg-navy-700",
+  primary: "bg-navy-900 text-paper hover:bg-navy-700",
   secondary: "border-2 border-navy-900/30 text-navy-900 hover:border-navy-900 hover:bg-sky-50",
   ghost: "text-navy-900 hover:bg-sky-100",
   // Ciano da marca: destaque pontual (ex.: "Continuar" no painel). Texto sempre escuro para manter o contraste.

@@ -36,7 +36,7 @@ export function ThemeToggle({ className, withLabel = false }: { className?: stri
       aria-label={label}
       title={label}
       className={cn(
-        "inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-line px-3 text-navy-900 transition-colors hover:bg-sky-100",
+        "inline-flex min-h-11 items-center justify-center gap-2 rounded-[10px] border border-line px-3 text-navy-900 transition-colors hover:bg-sky-100",
         !withLabel && "size-11 px-0",
         className,
       )}

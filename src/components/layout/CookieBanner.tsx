@@ -16,7 +16,7 @@ export function CookieBanner() {
     <div
       role="region"
       aria-label="Aviso de cookies"
-      className="page-in fixed inset-x-3 bottom-3 z-[45] mx-auto max-w-3xl rounded-3xl border border-line bg-surface p-5 text-[0.95rem] text-ink shadow-pop sm:flex sm:items-center sm:gap-6"
+      className="page-in fixed inset-x-3 bottom-3 z-[45] mx-auto max-w-3xl rounded-card border border-line bg-surface p-5 text-[0.95rem] text-ink shadow-pop sm:flex sm:items-center sm:gap-6"
     >
       <p>
         Usamos só cookies essenciais (login da área do aluno). O mapa do Google e as publicações do Instagram são

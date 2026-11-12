@@ -9,7 +9,7 @@ function initials(name: string) {
 
 export function TeacherCard({ teacher }: { teacher: Teacher }) {
   return (
-    <article className="reveal flex h-full gap-5 rounded-card border border-line bg-surface p-6 shadow-card">
+    <article className="flex gap-5 border-t border-line pt-6">
       <div className="relative size-20 shrink-0 overflow-hidden rounded-full bg-sky-100 sm:size-24">
         {teacher.photo ? (
           <Image src={teacher.photo} alt={`Foto de ${teacher.name}`} fill sizes="112px" className="object-cover" />
