@@ -29,6 +29,18 @@ export const loginSchema = z.object({
   password: z.string().min(1, "Informe a senha").max(200),
 });
 
+/** Esqueci minha senha: pedir o link e criar a nova senha. */
+export const resetRequestSchema = z.object({
+  email: z.string().trim().email("E-mail inválido").max(160),
+});
+
+export const newPasswordSchema = z
+  .object({
+    password: z.string().min(8, "Use ao menos 8 caracteres").max(200),
+    confirm: z.string().max(200),
+  })
+  .refine((d) => d.password === d.confirm, { path: ["confirm"], message: "As duas senhas não são iguais" });
+
 export const signupSchema = z.object({
   nome: z.string().trim().min(2, "Informe seu nome").max(100, "Nome muito longo"),
   email: z.string().trim().email("E-mail inválido").max(160),

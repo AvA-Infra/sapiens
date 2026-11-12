@@ -44,5 +44,5 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   // Só onde há sessão envolvida; páginas públicas ficam fora e continuam estáticas.
-  matcher: ["/aluno/:path*", "/admin/:path*", "/entrar", "/cadastrar"],
+  matcher: ["/aluno/:path*", "/admin/:path*", "/entrar", "/cadastrar", "/nova-senha", "/auth/:path*"],
 };
