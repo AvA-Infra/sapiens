@@ -34,7 +34,8 @@ export const enrollmentSchema = z.object({
 
 export const roleSchema = z.object({
   user_id: z.string().uuid(),
-  role: z.enum(["aluno", "professor", "admin"]),
+  // 'admin' aparece no painel como "Professor": todo professor é administrador.
+  role: z.enum(["aluno", "admin"]),
 });
 
 export const uuid = z.string().uuid();

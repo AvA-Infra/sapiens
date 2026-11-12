@@ -42,8 +42,17 @@ export async function requireRole(roles: Role[]): Promise<CurrentUser> {
   return user;
 }
 
+/**
+ * Equipe = professores. Todo professor é administrador: o papel gravado é 'admin'
+ * ('professor', de contas antigas, vale o mesmo).
+ */
+export const isStaff = (role: Role) => role === "admin" || role === "professor";
+
+/** Exige ser da equipe (painel). */
+export const requireStaff = () => requireRole(["admin", "professor"]);
+
 /** Aceita só caminhos internos conhecidos, evitando open redirect via ?next=. */
 export function safeNext(value: string | null | undefined): string {
   if (!value || !value.startsWith("/") || value.startsWith("//")) return "/aluno";
-  return ["/aluno", "/professor", "/admin"].some((p) => value === p || value.startsWith(`${p}/`)) ? value : "/aluno";
+  return ["/aluno", "/admin"].some((p) => value === p || value.startsWith(`${p}/`)) ? value : "/aluno";
 }

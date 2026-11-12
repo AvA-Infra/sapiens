@@ -10,7 +10,8 @@ export const metadata: Metadata = { title: "Entrar", robots: { index: false } };
 // searchParams é dado de requisição: lido dentro de um Suspense (Cache Components).
 async function Form({ searchParams }: { searchParams: Promise<{ next?: string }> }) {
   const { next } = await searchParams;
-  return <LoginForm next={safeNext(next)} />;
+  // Vazio quando ninguém pediu destino: aí o login decide (professor vai ao painel, aluno aos cursos).
+  return <LoginForm next={next ? safeNext(next) : ""} />;
 }
 
 export default function EntrarPage({ searchParams }: PageProps<"/entrar">) {

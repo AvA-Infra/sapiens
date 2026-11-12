@@ -40,7 +40,7 @@ export function ActionForm({
           type="submit"
           disabled={pending}
           className={cn(
-            "inline-flex min-h-11 items-center justify-center rounded-full px-5 font-semibold transition-colors disabled:opacity-60",
+            "inline-flex min-h-11 items-center justify-center rounded-[10px] px-5 font-semibold transition-colors disabled:opacity-60",
             styles,
           )}
         >

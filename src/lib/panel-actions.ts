@@ -2,17 +2,17 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { requireRole } from "@/lib/auth";
+import { requireStaff } from "@/lib/auth";
 import { courseSchema, lessonSchema, moduleSchema, uuid } from "@/lib/panel-schemas";
 import { createClient } from "@/lib/supabase/server";
 import type { ActionState } from "@/components/panel/ActionForm";
 
 /**
- * Ações do painel do professor. Toda ação confere o papel no servidor (requireRole) e o banco
- * confere de novo pelo RLS: mesmo que alguém chame a ação na mão, só professor/admin escreve.
+ * Ações de conteúdo do painel (cursos, módulos, aulas, materiais). Toda ação confere o papel no servidor (requireStaff) e o banco
+ * confere de novo pelo RLS: mesmo que alguém chame a ação na mão, só a equipe escreve.
  */
 
-const staff = () => requireRole(["professor", "admin"]);
+const staff = requireStaff;
 const flag = (fd: FormData, name: string) => fd.get(name) === "on";
 const first = (e: { issues: { message: string }[] }) => e.issues[0]?.message ?? "Confira os campos.";
 const DB_ERROR = "Não foi possível salvar agora. Tente de novo.";
@@ -55,7 +55,10 @@ export async function createCourse(_p: ActionState, fd: FormData): Promise<Actio
       })
       .select("id")
       .single();
-    if (data) redirect(`/professor/curso/${data.id}`);
+    if (data) {
+      revalidatePath("/admin", "layout");
+      redirect(`/admin/cursos/${data.id}`);
+    }
     if (error?.code !== "23505") return { error: DB_ERROR };
   }
   return { error: DB_ERROR };
@@ -82,20 +85,21 @@ export async function updateCourse(_p: ActionState, fd: FormData): Promise<Actio
     })
     .eq("id", id.data);
   if (error) return { error: DB_ERROR };
-  revalidatePath(`/professor/curso/${id.data}`);
-  revalidatePath("/professor");
+  revalidatePath(`/admin/cursos/${id.data}`);
+  revalidatePath("/admin", "layout");
   return { ok: true, message: "Curso salvo." };
 }
 
-/** Apagar um curso apaga módulos, aulas e o progresso dos alunos: só admin. */
+/** Apagar um curso apaga módulos, aulas e o progresso dos alunos (a tela pede confirmação). */
 export async function deleteCourse(_p: ActionState, fd: FormData): Promise<ActionState> {
-  await requireRole(["admin"]);
+  await staff();
   const id = uuid.safeParse(fd.get("id"));
   if (!id.success) return { error: "Curso inválido." };
   const supabase = await createClient();
   const { error } = await supabase.from("courses").delete().eq("id", id.data);
   if (error) return { error: DB_ERROR };
-  redirect("/professor");
+  revalidatePath("/admin", "layout");
+  redirect("/admin/cursos");
 }
 
 // ------------------------------------------------------------------ módulos
@@ -118,7 +122,7 @@ export async function createModule(_p: ActionState, fd: FormData): Promise<Actio
     .from("modules")
     .insert({ course_id: courseId.data, title: parsed.data.title, position: (last?.position ?? 0) + 1 });
   if (error) return { error: DB_ERROR };
-  revalidatePath(`/professor/curso/${courseId.data}`);
+  revalidatePath(`/admin/cursos/${courseId.data}`);
   return { ok: true, message: "Módulo criado." };
 }
 
@@ -133,7 +137,7 @@ export async function updateModule(_p: ActionState, fd: FormData): Promise<Actio
   const supabase = await createClient();
   const { error } = await supabase.from("modules").update({ title: parsed.data.title }).eq("id", id.data);
   if (error) return { error: DB_ERROR };
-  revalidatePath(`/professor/curso/${courseId.data}`);
+  revalidatePath(`/admin/cursos/${courseId.data}`);
   return { ok: true, message: "Módulo salvo." };
 }
 
@@ -145,7 +149,7 @@ export async function deleteModule(_p: ActionState, fd: FormData): Promise<Actio
   const supabase = await createClient();
   const { error } = await supabase.from("modules").delete().eq("id", id.data);
   if (error) return { error: DB_ERROR };
-  revalidatePath(`/professor/curso/${courseId.data}`);
+  revalidatePath(`/admin/cursos/${courseId.data}`);
   return { ok: true, message: "Módulo excluído." };
 }
 
@@ -175,7 +179,7 @@ async function move(table: "modules" | "lessons", fd: FormData) {
 
   await supabase.from(table).update({ position: neighbor.position }).eq("id", me.id);
   await supabase.from(table).update({ position: me.position }).eq("id", neighbor.id);
-  revalidatePath(`/professor/curso/${courseId.data}`);
+  revalidatePath(`/admin/cursos/${courseId.data}`);
 }
 export async function moveModule(fd: FormData) {
   await move("modules", fd);
@@ -206,7 +210,7 @@ export async function createLesson(_p: ActionState, fd: FormData): Promise<Actio
     .select("id")
     .single();
   if (error || !data) return { error: DB_ERROR };
-  redirect(`/professor/aula/${data.id}`);
+  redirect(`/admin/aulas/${data.id}`);
 }
 
 export async function updateLesson(_p: ActionState, fd: FormData): Promise<ActionState> {
@@ -237,7 +241,7 @@ export async function updateLesson(_p: ActionState, fd: FormData): Promise<Actio
     })
     .eq("id", id.data);
   if (error) return { error: DB_ERROR };
-  revalidatePath(`/professor/aula/${id.data}`);
+  revalidatePath(`/admin/aulas/${id.data}`);
   return { ok: true, message: d.published ? "Aula salva e publicada." : "Aula salva como rascunho." };
 }
 
@@ -249,7 +253,7 @@ export async function deleteLesson(_p: ActionState, fd: FormData): Promise<Actio
   const supabase = await createClient();
   const { error } = await supabase.from("lessons").delete().eq("id", id.data);
   if (error) return { error: DB_ERROR };
-  redirect(`/professor/curso/${courseId.data}`);
+  redirect(`/admin/cursos/${courseId.data}`);
 }
 
 // ------------------------------------------------------------------ materiais (PDF)
@@ -274,7 +278,7 @@ export async function addMaterial(lessonId: string, title: string, path: string)
 
   const { error } = await supabase.from("materials").insert({ lesson_id: id.data, title: cleanTitle, file_path: path });
   if (error) return { error: DB_ERROR };
-  revalidatePath(`/professor/aula/${id.data}`);
+  revalidatePath(`/admin/aulas/${id.data}`);
   return { ok: true, message: "Material adicionado." };
 }
 
@@ -289,6 +293,6 @@ export async function deleteMaterial(_p: ActionState, fd: FormData): Promise<Act
   if (mat?.file_path) await supabase.storage.from("materials").remove([mat.file_path as string]);
   const { error } = await supabase.from("materials").delete().eq("id", id.data);
   if (error) return { error: DB_ERROR };
-  revalidatePath(`/professor/aula/${lessonId.data}`);
+  revalidatePath(`/admin/aulas/${lessonId.data}`);
   return { ok: true, message: "Material removido." };
 }

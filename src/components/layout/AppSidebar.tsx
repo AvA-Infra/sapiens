@@ -6,13 +6,14 @@ import { useEffect, useRef, useState } from "react";
 import {
   BookOpen,
   ClipboardList,
+  Eye,
   Globe,
   GraduationCap,
   LayoutDashboard,
   LogOut,
   Mail,
   Menu,
-  PenSquare,
+  Plus,
   Users,
   X,
   type LucideIcon,
@@ -23,33 +24,43 @@ import { signOut } from "@/lib/auth-actions";
 import type { Role } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
-type Item = { href: string; label: string; icon: LucideIcon; exact?: boolean };
+type Item = { href: string; label: string; icon: LucideIcon; exact?: boolean; badge?: number };
 type Group = { title: string; items: Item[] };
+export type PanelNav = { courses: { id: string; title: string }[]; pending: number };
 
-/** Links do painel conforme o papel: o aluno vê o dele; professor e admin acumulam os anteriores. */
-function groupsFor(role: Role): Group[] {
-  const groups: Group[] = [{ title: "Aluno", items: [{ href: "/aluno", label: "Meus cursos", icon: BookOpen }] }];
-  if (role === "professor" || role === "admin") {
-    groups.push({ title: "Professor", items: [{ href: "/professor", label: "Cursos e aulas", icon: PenSquare }] });
-  }
-  if (role === "admin") {
-    groups.push({
-      title: "Administração",
+const isStaff = (role: Role) => role === "admin" || role === "professor";
+
+/**
+ * Links conforme o papel. O aluno vê os cursos dele. A equipe (todo professor é admin) vê o painel
+ * e cada curso separado, com link direto.
+ */
+function groupsFor(role: Role, panel?: PanelNav): Group[] {
+  if (!isStaff(role)) return [{ title: "Aluno", items: [{ href: "/aluno", label: "Meus cursos", icon: BookOpen }] }];
+  return [
+    {
+      title: "Painel",
       items: [
         { href: "/admin", label: "Visão geral", icon: LayoutDashboard, exact: true },
-        { href: "/admin/usuarios", label: "Usuários", icon: Users },
+        { href: "/admin/matriculas", label: "Liberar acesso", icon: ClipboardList, badge: panel?.pending },
+        { href: "/admin/usuarios", label: "Alunos e professores", icon: Users },
         { href: "/admin/turmas", label: "Turmas", icon: GraduationCap },
-        { href: "/admin/matriculas", label: "Matrículas", icon: ClipboardList },
         { href: "/admin/mensagens", label: "Mensagens", icon: Mail },
       ],
-    });
-  }
-  return groups;
+    },
+    {
+      title: "Cursos",
+      items: [
+        ...(panel?.courses ?? []).map((c) => ({ href: `/admin/cursos/${c.id}`, label: c.title, icon: BookOpen })),
+        { href: "/admin/cursos", label: "Todos e novo curso", icon: Plus, exact: true },
+      ],
+    },
+    { title: "Visão do aluno", items: [{ href: "/aluno", label: "Área do aluno", icon: Eye }] },
+  ];
 }
 
-const roleLabel: Record<Role, string> = { aluno: "Aluno", professor: "Professor", admin: "Administrador" };
+const roleLabel: Record<Role, string> = { aluno: "Aluno", professor: "Professor", admin: "Professor" };
 
-function SidebarContent({ nome, role, onNavigate }: { nome: string; role: Role; onNavigate?: () => void }) {
+function SidebarContent({ nome, role, panel, onNavigate }: { nome: string; role: Role; panel?: PanelNav; onNavigate?: () => void }) {
   const pathname = usePathname();
   const active = (it: Item) => (it.exact ? pathname === it.href : pathname === it.href || pathname.startsWith(`${it.href}/`));
 
@@ -65,7 +76,7 @@ function SidebarContent({ nome, role, onNavigate }: { nome: string; role: Role; 
       </div>
 
       <nav aria-label="Painel" className="mt-5 flex-1 space-y-5 overflow-y-auto px-3">
-        {groupsFor(role).map((g) => (
+        {groupsFor(role, panel).map((g) => (
           <div key={g.title}>
             <p className="px-3 pb-1.5 text-xs font-bold uppercase tracking-[0.18em] text-ink-soft">{g.title}</p>
             <ul className="space-y-1">
@@ -83,7 +94,18 @@ function SidebarContent({ nome, role, onNavigate }: { nome: string; role: Role; 
                       )}
                     >
                       <it.icon className="size-5 shrink-0" aria-hidden />
-                      {it.label}
+                      <span className="min-w-0 flex-1 truncate">{it.label}</span>
+                      {it.badge ? (
+                        <span
+                          className={cn(
+                            "rounded-[6px] px-2 py-0.5 text-sm font-bold",
+                            on ? "bg-paper text-navy-900" : "bg-sky-400 text-navy-950",
+                          )}
+                        >
+                          {it.badge}
+                          <span className="sr-only"> esperando</span>
+                        </span>
+                      ) : null}
                     </Link>
                   </li>
                 );
@@ -121,7 +143,7 @@ function SidebarContent({ nome, role, onNavigate }: { nome: string; role: Role; 
  * Navegação das áreas logadas: sidebar fixa colada na lateral esquerda (sem cantos arredondados nas
  * bordas externas), sempre visível a partir de 1024 px. Abaixo disso, barra fina no topo com gaveta.
  */
-export function AppSidebar({ nome, role }: { nome: string; role: Role }) {
+export function AppSidebar({ nome, role, panel }: { nome: string; role: Role; panel?: PanelNav }) {
   const [open, setOpen] = useState(false);
   const closeRef = useRef<HTMLButtonElement>(null);
 
@@ -140,7 +162,7 @@ export function AppSidebar({ nome, role }: { nome: string; role: Role }) {
   return (
     <>
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 border-r border-line bg-paper lg:block">
-        <SidebarContent nome={nome} role={role} />
+        <SidebarContent nome={nome} role={role} panel={panel} />
       </aside>
 
       <div className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-line bg-paper/95 px-4 backdrop-blur lg:hidden">
@@ -178,7 +200,7 @@ export function AppSidebar({ nome, role }: { nome: string; role: Role }) {
             >
               <X className="size-6" aria-hidden />
             </button>
-            <SidebarContent nome={nome} role={role} onNavigate={() => setOpen(false)} />
+            <SidebarContent nome={nome} role={role} panel={panel} onNavigate={() => setOpen(false)} />
           </div>
         </div>
       )}

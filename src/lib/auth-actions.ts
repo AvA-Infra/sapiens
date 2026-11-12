@@ -40,11 +40,17 @@ export async function signIn(_prev: AuthState, formData: FormData): Promise<Auth
   if (!byIp.ok || !byEmail.ok) return { error: "Muitas tentativas. Tente de novo em alguns minutos." };
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword(parsed.data);
+  const { data, error } = await supabase.auth.signInWithPassword(parsed.data);
   // Mensagem única: não revela se o e-mail existe.
   if (error) return { error: "E-mail ou senha incorretos." };
 
-  redirect(safeNext(String(formData.get("next") ?? "")));
+  const next = String(formData.get("next") ?? "");
+  if (!next) {
+    // Sem destino pedido: professor cai direto no painel, aluno nos cursos dele.
+    const { data: profile } = await supabase.from("profiles").select("role").eq("id", data.user.id).single();
+    if (profile?.role === "admin" || profile?.role === "professor") redirect("/admin");
+  }
+  redirect(safeNext(next));
 }
 
 export async function signUp(_prev: AuthState, formData: FormData): Promise<AuthState> {

@@ -2,8 +2,8 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { isSupabaseConfigured, supabaseAnonKey, supabaseUrl } from "@/lib/supabase/env";
 
-/** Áreas que exigem login. O papel (aluno/professor/admin) é checado no servidor, em lib/auth.ts, e pelo RLS. */
-const PROTECTED = ["/aluno", "/professor", "/admin"];
+/** Áreas que exigem login. O papel (aluno/admin) é checado no servidor, em lib/auth.ts, e pelo RLS. */
+const PROTECTED = ["/aluno", "/admin"];
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -44,5 +44,5 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   // Só onde há sessão envolvida; páginas públicas ficam fora e continuam estáticas.
-  matcher: ["/aluno/:path*", "/professor/:path*", "/admin/:path*", "/entrar", "/cadastrar"],
+  matcher: ["/aluno/:path*", "/admin/:path*", "/entrar", "/cadastrar"],
 };

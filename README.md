@@ -99,7 +99,7 @@ Um botão de chat no site público responde dúvidas simples e encaminha para o 
 ## Banco de dados (Supabase)
 
 1. Crie um projeto no [Supabase](https://supabase.com).
-2. No **SQL Editor**, rode `supabase/migrations/0001_init.sql`. Isso cria as tabelas, o RLS e o bucket privado `materials`.
+2. No **SQL Editor**, rode `supabase/migrations/0001_init.sql` e depois `supabase/migrations/0002_professores_admin.sql`. Isso cria as tabelas, o RLS e o bucket privado `materials`.
 3. Crie sua conta em `/cadastrar` e torne-se admin (troque o e-mail):
    ```sql
    update public.profiles set role = 'admin'
@@ -110,11 +110,13 @@ Um botão de chat no site público responde dúvidas simples e encaminha para o 
 
 ### Papéis e acesso
 
-`aluno` (padrão ao cadastrar) · `professor` (painel de conteúdo) · `admin` (usuários, turmas, matrículas).
+Dois papéis: `aluno` (padrão ao cadastrar) e **professor**. Todo professor é administrador: no banco o papel gravado é `admin` (o valor antigo `professor` vale o mesmo).
 
-- O papel é checado **no servidor** (`requireRole`, em `src/lib/auth.ts`) e **no banco** (RLS). Ninguém se promove pelo navegador: a policy de `profiles` trava a coluna `role`.
+- **Painel (`/admin`)**: visão geral com os pedidos esperando liberação, "Liberar acesso" (todos os cursos), "Alunos e professores" (quem é aluno e quem é professor), turmas e mensagens. Na barra lateral, cada curso aparece separado; dentro dele há três abas: **Aulas**, **Alunos** (liberar e cancelar o acesso daquele curso) e **Dados do curso**.
+- Para tornar alguém professor: "Alunos e professores", escolha "Professor" e salve. O primeiro professor é criado pelo comando SQL acima.
+- O papel é checado **no servidor** (`requireStaff`, em `src/lib/auth.ts`) e **no banco** (RLS). Ninguém se promove pelo navegador: a policy de `profiles` trava a coluna `role`.
 - O aluno só vê aulas **publicadas** de cursos em que tem **matrícula ativa**. Isso vale para vídeos, materiais e dúvidas.
-- `/aluno`, `/professor` e `/admin` exigem login (`src/proxy.ts`).
+- `/aluno` e `/admin` exigem login (`src/proxy.ts`). Os endereços antigos `/professor/...` redirecionam para o painel.
 
 ## Vídeos
 

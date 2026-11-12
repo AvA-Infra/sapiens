@@ -12,8 +12,8 @@ export default async function TurmasPage() {
 
   return (
     <Section>
-      <Eyebrow>Painel admin</Eyebrow>
-      <h1 className="text-5xl font-bold text-navy-900 sm:text-6xl">Turmas</h1>
+      <Eyebrow>Painel</Eyebrow>
+      <h1 className="text-4xl font-bold text-navy-900 sm:text-5xl">Turmas</h1>
 
       <div className="mt-10 grid gap-10 lg:grid-cols-[1.5fr_1fr]">
         <ul className="space-y-4">

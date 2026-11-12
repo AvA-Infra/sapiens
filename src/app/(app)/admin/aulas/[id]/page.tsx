@@ -36,10 +36,10 @@ export default async function AulaEditPage({ params }: { params: Promise<{ id: s
 
   return (
     <Section>
-      <Link href={`/professor/curso/${course.id}`} className="text-sm font-semibold text-sky-600 hover:text-navy-900">
-        ← {course.title}
+      <Link href={`/admin/cursos/${course.id}`} className="text-sm font-semibold text-sky-600 underline underline-offset-2 hover:text-navy-900">
+        {course.title}
       </Link>
-      <h1 className="mt-3 text-5xl font-bold text-navy-900 sm:text-6xl">{lesson.title}</h1>
+      <h1 className="mt-3 text-4xl font-bold text-navy-900 sm:text-5xl">{lesson.title}</h1>
 
       <div className="mt-10 grid gap-12 lg:grid-cols-[1.3fr_1fr]">
         <section aria-labelledby="aula" className="rounded-card bg-sky-50 p-6">

@@ -45,7 +45,13 @@ const nextConfig: NextConfig = {
   partialPrefetching: true,
   poweredByHeader: false,
   async redirects() {
-    return [{ source: "/aprovados", destination: "/quem-cursa-aprova", permanent: true }];
+    return [
+      { source: "/aprovados", destination: "/quem-cursa-aprova", permanent: true },
+      // O painel do professor virou parte do painel admin (todo professor é admin).
+      { source: "/professor", destination: "/admin/cursos", permanent: false },
+      { source: "/professor/curso/:id", destination: "/admin/cursos/:id", permanent: false },
+      { source: "/professor/aula/:id", destination: "/admin/aulas/:id", permanent: false },
+    ];
   },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];

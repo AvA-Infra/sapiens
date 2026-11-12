@@ -14,8 +14,8 @@ export default async function MensagensPage() {
 
   return (
     <Section>
-      <Eyebrow>Painel admin</Eyebrow>
-      <h1 className="text-5xl font-bold text-navy-900 sm:text-6xl">Mensagens de contato</h1>
+      <Eyebrow>Painel</Eyebrow>
+      <h1 className="text-4xl font-bold text-navy-900 sm:text-5xl">Mensagens de contato</h1>
       <p className="mt-3 max-w-2xl text-ink-soft">Enviadas pelo formulário do site. Respondemos pelo e-mail ou telefone informado.</p>
 
       <ul className="mt-8 space-y-4">
