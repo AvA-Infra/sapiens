@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { Clock, MapPin, Navigation } from "lucide-react";
+import { MapEmbed } from "@/components/MapEmbed";
 import { Button } from "@/components/ui/Button";
 import { Pending, PageHeader, Section, Eyebrow } from "@/components/ui/Section";
 import { isPlaceholder, spacePhotos } from "@/config/content";
 import { mapsLink, site } from "@/config/site";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/estrutura" },
   title: "Estrutura e localização",
   description: "Conheça o espaço da Sapiens no Shopping Avenida 28, no Centro de Campos dos Goytacazes, e veja como chegar.",
 };
@@ -42,7 +44,7 @@ export default function EstruturaPage() {
         <div className="grid gap-12 lg:grid-cols-[1fr_1.2fr]">
           <div>
             <Eyebrow>Como chegar</Eyebrow>
-            <h2 id="chegar" className="text-3xl font-bold text-navy-900 sm:text-4xl">Venha conhecer</h2>
+            <h2 id="chegar" className="text-4xl font-bold text-navy-900 sm:text-5xl">Venha conhecer</h2>
             <ul className="mt-8 space-y-6">
               <li className="flex gap-4">
                 <MapPin className="mt-1 size-5 shrink-0 text-sky-500" aria-hidden />
@@ -70,13 +72,7 @@ export default function EstruturaPage() {
               <Navigation className="size-4" aria-hidden /> Traçar rota no Google Maps
             </Button>
           </div>
-          <iframe
-            title="Mapa: Sapiens Biomédicas, Av. Vinte e Oito de Março, 574, Campos dos Goytacazes"
-            src={`https://maps.google.com/maps?q=${encodeURIComponent(`${address.street}, ${address.city} - ${address.state}`)}&output=embed`}
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            className="h-80 w-full rounded-card border border-line sm:h-[26rem]"
-          />
+          <MapEmbed className="h-80 sm:h-[26rem]" />
         </div>
       </Section>
     </>

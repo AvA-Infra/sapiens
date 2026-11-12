@@ -19,13 +19,16 @@ Branco é a cor dominante (fundo principal). Azul-escuro e azul-claro **nunca** 
 | `line` | #d3e6f2 | #1c3270 | Bordas |
 
 ### Tema claro e escuro
-- Padrão: **claro**. Botão sol/lua na navbar e na sidebar; a escolha fica no `localStorage` (`sapiens-theme`) e é aplicada por um script no `<head>`, antes da primeira pintura (sem "flash").
+- Padrão: **segue o sistema operacional** (claro ou escuro). O botão sol/lua na navbar e na sidebar fixa uma escolha manual, guardada no `localStorage` (`sapiens-theme`). Tudo é aplicado por um script no `<head>`, antes da primeira pintura (sem "flash").
 - O tema escuro é a **mesma paleta com o peso invertido**: `paper` e `navy-900` trocam de lugar. Por isso `bg-paper` + `text-navy-900` e `bg-navy-900` + `text-paper` funcionam nos dois temas sem código extra. Use `dark:` apenas em exceções.
-- A classe `dark` fica no `<html>` (não segue a preferência do sistema).
+- A classe `dark` fica no `<html>`, posta pelo script conforme o sistema ou a escolha manual.
+- **Exceção única ao "azul nunca preenche uma seção":** a faixa de números da home usa azul-marinho (`Section tone="deep"`, tokens `deep` / `on-deep`). Não repita em outras seções.
+- Cartões usam `bg-surface` com `shadow-card` (repouso) ou `shadow-pop` (destaque). As sombras são tingidas de azul-marinho, nunca cinza.
 - Contraste AA verificado no tema claro (Lighthouse: acessibilidade 100). No escuro, os pares de tokens têm contraste acima de 9:1.
 
 ## Tipografia
-- **Títulos:** Baloo 2 (500 a 700). Arredondada e acolhedora, sempre em caixa normal (sem caixa alta).
+- **Títulos:** Barlow Condensed (500 a 700). Grotesca estreita, na mesma linha do "SAPIENS" da logo oficial. Sempre em caixa normal, tamanhos grandes e entrelinha curta (1,02). Substituiu a Baloo 2 em novembro de 2026.
+- **Rótulos de seção** (`Eyebrow`): caixa normal, com um traço ciano à esquerda. Sem caixa alta com espaçamento largo.
 - **Texto:** Figtree. Corpo em 17 px, entrelinha 1,6.
 - Via `next/font`: `--font-display-face` e `--font-body`.
 
@@ -41,7 +44,8 @@ Branco é a cor dominante (fundo principal). Azul-escuro e azul-claro **nunca** 
 
 ## Botões e movimento
 - Botões grandes (mínimo de 48 px), com ícone, e microanimação de hover e clique. O botão principal do hero e dos planos usa o **vidro líquido** (`LiquidButton`); não use em mais lugares (o filtro é pesado).
-- Fade-in ao rolar, hover elevando cartões e uma entrada curta a cada página. Tudo respeita `prefers-reduced-motion`.
+- Entrada ao rolar em CSS puro (`.reveal`, scroll-driven animations), hover elevando cartões e troca de página com a View Transitions API. Tudo respeita `prefers-reduced-motion`.
+- O WhatsApp usa o verde próprio (`bg-whatsapp`) só no botão flutuante e no agendamento de visita.
 
 ## Tom de voz
 Direto, humano e específico: Medicina, nota de corte, redação, simulado, aprovação. Sem "soluções inovadoras".

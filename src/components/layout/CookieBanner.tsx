@@ -1,56 +1,47 @@
 "use client";
 
 import Link from "next/link";
-import { useSyncExternalStore } from "react";
-import { Check } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { setConsent, useConsent } from "@/lib/consent";
 
-const KEY = "sapiens-cookies-ok";
-const listeners = new Set<() => void>();
-
-function subscribe(cb: () => void) {
-  listeners.add(cb);
-  return () => listeners.delete(cb);
-}
-
-function accepted() {
-  try {
-    return localStorage.getItem(KEY) === "1";
-  } catch {
-    return false;
-  }
-}
-
-/** Aviso enxuto de cookies. O login usa cookie essencial; Instagram e Google Maps podem definir os próprios. */
+/**
+ * Aviso de cookies conforme a LGPD: recusar é tão fácil quanto aceitar, e nada de terceiros
+ * carrega antes da resposta. A escolha pode ser revista em "Preferências de cookies", no rodapé.
+ */
 export function CookieBanner() {
-  // No servidor assume "já aceito" (não renderiza), evitando flash e erro de hidratação.
-  const ok = useSyncExternalStore(subscribe, accepted, () => true);
-  if (ok) return null;
-
-  const accept = () => {
-    try {
-      localStorage.setItem(KEY, "1");
-    } catch {}
-    listeners.forEach((l) => l());
-  };
+  const consent = useConsent();
+  if (consent !== null) return null;
 
   return (
     <div
       role="region"
       aria-label="Aviso de cookies"
-      className="page-in fixed inset-x-3 bottom-3 z-40 mx-auto flex max-w-2xl flex-col gap-3 rounded-3xl border border-line bg-paper p-4 text-sm text-ink shadow-2xl shadow-navy-900/20 sm:flex-row sm:items-center"
+      className="page-in fixed inset-x-3 bottom-3 z-[45] mx-auto max-w-3xl rounded-3xl border border-line bg-surface p-5 text-[0.95rem] text-ink shadow-pop sm:flex sm:items-center sm:gap-6"
     >
       <p>
-        Usamos cookies essenciais para o login. Algumas páginas incorporam o Instagram e o Google Maps, que podem definir
-        os próprios cookies.{" "}
+        Usamos só cookies essenciais (login da área do aluno). O mapa do Google e as publicações do Instagram são
+        conteúdos de terceiros e podem usar cookies próprios: eles só carregam se você permitir.{" "}
         <Link href="/privacidade" className="font-semibold text-sky-600 underline underline-offset-2">
-          Saiba mais
+          Política de privacidade
         </Link>
-        .
       </p>
-      <Button onClick={accept} size="sm" className="shrink-0">
-        <Check className="size-4" aria-hidden /> Entendi
-      </Button>
+      <div className="mt-4 flex shrink-0 flex-wrap gap-2 sm:mt-0 sm:flex-col">
+        <Button onClick={() => setConsent("all")} size="sm" className="flex-1">
+          Permitir tudo
+        </Button>
+        <Button onClick={() => setConsent("essential")} size="sm" variant="secondary" className="flex-1">
+          Só o essencial
+        </Button>
+      </div>
     </div>
+  );
+}
+
+/** Link do rodapé para rever a escolha: limpa a resposta e o aviso volta a aparecer. */
+export function CookiePreferencesButton({ className }: { className?: string }) {
+  return (
+    <button type="button" onClick={() => setConsent(null)} className={className}>
+      Preferências de cookies
+    </button>
   );
 }

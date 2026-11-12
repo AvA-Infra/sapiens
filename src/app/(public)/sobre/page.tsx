@@ -4,6 +4,7 @@ import { TeacherCard } from "@/components/ui/TeacherCard";
 import { teachers } from "@/config/content";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/sobre" },
   title: "Sobre e equipe",
   description: "A história da Sapiens Biomédicas, nossos valores e os professores que dão aula no Centro de Campos.",
 };
@@ -20,7 +21,7 @@ export default function SobrePage() {
         <div className="grid gap-12 lg:grid-cols-[1fr_1.2fr]">
           <div>
             <Eyebrow>História</Eyebrow>
-            <h2 id="historia" className="text-3xl font-bold text-navy-900 sm:text-4xl">
+            <h2 id="historia" className="text-4xl font-bold text-navy-900 sm:text-5xl">
               Do presencial ao digital
             </h2>
           </div>
@@ -40,13 +41,13 @@ export default function SobrePage() {
       <Section tone="soft" labelledBy="missao">
         <div className="grid gap-10 md:grid-cols-2">
           <div>
-            <h2 id="missao" className="text-2xl font-bold text-navy-900">Missão</h2>
+            <h2 id="missao" className="text-4xl font-bold text-navy-900">Missão</h2>
             <div className="mt-3">
               <Pending>Texto da missão, nas palavras da escola.</Pending>
             </div>
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-navy-900">Valores</h2>
+            <h2 className="text-4xl font-bold text-navy-900">Valores</h2>
             <p className="mt-3 text-lg">
               Somos uma empresa de empreendedoras e todo estudante é bem-vindo aqui, incluindo a comunidade LGBTQ+.
               Estudar para o vestibular já pesa o bastante; o ambiente não precisa pesar junto.
@@ -57,8 +58,8 @@ export default function SobrePage() {
 
       <Section labelledBy="equipe">
         <Eyebrow>Equipe</Eyebrow>
-        <h2 id="equipe" className="text-3xl font-bold text-navy-900 sm:text-4xl">Professores</h2>
-        <div className="mt-10 grid gap-10 md:grid-cols-2 lg:grid-cols-3">
+        <h2 id="equipe" className="text-4xl font-bold text-navy-900 sm:text-5xl">Professores</h2>
+        <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {teachers.map((t) => (
             <TeacherCard key={t.id} teacher={t} />
           ))}

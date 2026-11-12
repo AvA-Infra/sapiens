@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
-/* Tema escuro por classe no <html> (class="dark"), e não pela preferência do sistema. */
+/* Tema escuro por classe no <html> (class="dark"). O script do <head> (src/app/layout.tsx) põe a classe
+   seguindo o sistema operacional, a menos que a pessoa tenha escolhido um tema no botão sol/lua. */
 @custom-variant dark (&:where(.dark, .dark *));
 
 /*
@@ -33,6 +34,19 @@
   /* Cor (r g b) dos desenhos em canvas do hero: rede neural */
   --net-rgb: 4 78 149;
 
+  /* Superfície elevada (cartões) e a ÚNICA faixa escura do site (números). Não invertem como os demais. */
+  --surface: #ffffff;
+  --deep: #001650;
+  --deep-2: #032a6b;
+  --on-deep: #f2f8ff;
+  --on-deep-soft: #a9cdf5;
+
+  /* Sombras em duas camadas, tingidas de azul-marinho (nunca cinza neutro). */
+  --shadow-rgb: 0 22 80;
+  --elev-card: 0 1px 2px rgb(var(--shadow-rgb) / 0.06), 0 10px 28px -14px rgb(var(--shadow-rgb) / 0.18);
+  --elev-pop: 0 2px 4px rgb(var(--shadow-rgb) / 0.06), 0 24px 48px -20px rgb(var(--shadow-rgb) / 0.32);
+  --whatsapp: #0e7a3f; /* verde do WhatsApp escurecido: texto branco com contraste AA */
+
   --background: var(--paper);
   --foreground: var(--ink);
   --ring: var(--sky-500);
@@ -58,6 +72,13 @@
   --line: #1c3270;
 
   --net-rgb: 181 243 255;
+
+  --surface: #0a1a45;
+  --deep: #0c2562;
+  --deep-2: #123383;
+  --shadow-rgb: 0 4 20;
+  --elev-card: 0 1px 2px rgb(var(--shadow-rgb) / 0.4), 0 10px 28px -14px rgb(var(--shadow-rgb) / 0.7);
+  --elev-pop: 0 2px 4px rgb(var(--shadow-rgb) / 0.4), 0 24px 48px -20px rgb(var(--shadow-rgb) / 0.8);
   color-scheme: dark;
 }
 
@@ -76,13 +97,21 @@
   --color-ink: var(--ink);
   --color-ink-soft: var(--ink-soft);
   --color-line: var(--line);
+  --color-surface: var(--surface);
+  --color-deep: var(--deep);
+  --color-deep-2: var(--deep-2);
+  --color-on-deep: var(--on-deep);
+  --color-on-deep-soft: var(--on-deep-soft);
+  --color-whatsapp: var(--whatsapp);
+  --shadow-card: var(--elev-card);
+  --shadow-pop: var(--elev-pop);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
 
-  --font-display: var(--font-display-face), ui-rounded, system-ui, sans-serif;
+  --font-display: var(--font-display-face), "Arial Narrow", system-ui, sans-serif;
   --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
 
-  --radius-card: 18px;
+  --radius-card: 20px;
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -105,8 +134,8 @@ h2,
 h3,
 h4 {
   font-family: var(--font-display);
-  letter-spacing: 0;
-  line-height: 1.1;
+  letter-spacing: -0.005em;
+  line-height: 1.02;
   text-wrap: balance;
 }
 
@@ -185,3 +214,185 @@ p {
   -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
 }
+
+/* ---------- Animações ligadas à rolagem (CSS puro, sem JavaScript) ----------
+   Só valem onde o navegador suporta animation-timeline e a pessoa não pediu menos movimento.
+   Sem suporte (ou com movimento reduzido) o conteúdo simplesmente aparece no lugar. */
+@keyframes reveal-in {
+  from { opacity: 0; transform: translateY(28px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes grow-x {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
+      animation: reveal-in linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 45%;
+    }
+    /* Barra de progresso de leitura (artigos do blog): acompanha a rolagem da página. */
+    .read-progress {
+      transform-origin: left;
+      animation: grow-x linear both;
+      animation-timeline: scroll(root);
+    }
+  }
+}
+@supports not (animation-timeline: view()) {
+  .read-progress { display: none; }
+}
+
+/* ---------- Transições entre páginas (View Transitions API, via <ViewTransition> do React) ---------- */
+@keyframes vt-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes vt-rise {
+  from { transform: translateY(12px); }
+  to { transform: none; }
+}
+::view-transition-old(.page) {
+  animation: 140ms ease-in both vt-fade reverse;
+}
+::view-transition-new(.page) {
+  animation: 220ms ease-out 120ms both vt-fade, 380ms var(--ease-out-expo) 120ms both vt-rise;
+}
+/* A navbar não participa: fica parada enquanto o conteúdo troca. */
+::view-transition-group(site-header) {
+  animation: none;
+  z-index: 100;
+}
+::view-transition-old(site-header) {
+  display: none;
+}
+::view-transition-new(site-header) {
+  animation: none;
+}
+::view-transition {
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+}
+
+/* ---------- Listão de aprovados (hero): rola sozinho, pausa com o mouse ou o foco ---------- */
+@keyframes listao {
+  from { transform: translateY(0); }
+  to { transform: translateY(-50%); }
+}
+.listao-track {
+  animation: listao var(--listao-duration, 60s) linear infinite;
+}
+.listao:hover .listao-track,
+.listao:focus-within .listao-track {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .listao-track { animation: none; }
+  .listao { overflow-y: auto; }
+}
+
+/* ---------- Microinterações ---------- */
+/* Seta/ícone que avança quando o link ou cartão recebe hover. */
+.nudge {
+  transition: transform 0.25s var(--ease-out-expo);
+}
+@media (hover: hover) {
+  a:hover > .nudge,
+  button:hover > .nudge,
+  .group:hover .nudge {
+    transform: translateX(4px);
+  }
+}
+/* Campo de formulário: realce suave no foco e no erro. */
+.field {
+  transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+}
+.field:focus {
+  outline: none;
+  border-color: var(--sky-500);
+  box-shadow: 0 0 0 4px rgb(27 155 224 / 0.18);
+}
+.field[aria-invalid="true"] {
+  border-color: #c62828;
+  box-shadow: 0 0 0 4px rgb(198 40 40 / 0.12);
+}
+/* Confirmação de envio: o círculo cresce e o "check" se desenha. */
+@keyframes pop-in {
+  from { opacity: 0; transform: scale(0.6); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes draw {
+  to { stroke-dashoffset: 0; }
+}
+.success-badge {
+  animation: pop-in 0.5s var(--ease-out-expo) both;
+}
+.success-check {
+  stroke-dasharray: 32;
+  stroke-dashoffset: 32;
+  animation: draw 0.45s 0.25s ease-out forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .success-check { stroke-dashoffset: 0; }
+}
+
+/* Sanfona do FAQ: abre e fecha com altura animada onde o navegador suporta. */
+:root {
+  interpolate-size: allow-keywords;
+}
+details.faq::details-content {
+  block-size: 0;
+  overflow: clip;
+  opacity: 0;
+  transition: block-size 0.3s var(--ease-out-expo), opacity 0.3s, content-visibility 0.3s allow-discrete;
+}
+details.faq[open]::details-content {
+  block-size: auto;
+  opacity: 1;
+}
+details.faq > summary {
+  list-style: none;
+  cursor: pointer;
+}
+details.faq > summary::-webkit-details-marker {
+  display: none;
+}
+details.faq .faq-icon {
+  transition: transform 0.3s var(--ease-out-expo);
+}
+details.faq[open] .faq-icon {
+  transform: rotate(45deg);
+}
+
+/* ---------- Texto longo (artigos do blog, renderizados de Markdown) ---------- */
+.prose {
+  max-width: 68ch;
+  font-size: 1.125rem;
+  line-height: 1.7;
+}
+.prose > * + * { margin-top: 1.25em; }
+.prose h2 { margin-top: 2em; font-size: 2.25rem; font-weight: 700; color: var(--navy-900); }
+.prose h3 { margin-top: 1.6em; font-size: 1.7rem; font-weight: 600; color: var(--navy-900); }
+.prose a { color: var(--sky-600); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.prose strong { color: var(--navy-900); }
+.prose ul { list-style: disc; padding-left: 1.4em; }
+.prose ol { list-style: decimal; padding-left: 1.4em; }
+.prose li + li { margin-top: 0.4em; }
+.prose blockquote {
+  border-left: 4px solid var(--sky-400);
+  padding: 0.25em 0 0.25em 1.1em;
+  color: var(--ink-soft);
+}
+.prose table { width: 100%; border-collapse: collapse; font-size: 1rem; }
+.prose th, .prose td { border-bottom: 1px solid var(--line); padding: 0.6em 0.75em 0.6em 0; text-align: left; }
+.prose th { color: var(--navy-900); }
+.prose hr { border-color: var(--line); margin-block: 2.5em; }

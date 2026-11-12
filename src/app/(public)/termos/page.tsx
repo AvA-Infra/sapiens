@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { PageHeader, Section } from "@/components/ui/Section";
 
-export const metadata: Metadata = { title: "Termos de uso" };
+export const metadata: Metadata = {
+  alternates: { canonical: "/termos" }, title: "Termos de uso" };
 
 export default function TermosPage() {
   return (

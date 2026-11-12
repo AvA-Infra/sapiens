@@ -4,14 +4,15 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { Turnstile, resetTurnstile } from "@/components/Turnstile";
 import { Button } from "@/components/ui/Button";
+import { whatsappLink } from "@/config/site";
 import { contactSchema } from "@/lib/schemas";
 
 type Errors = Partial<Record<"name" | "email" | "phone" | "message" | "consent", string>>;
 type Status = { kind: "idle" } | { kind: "sending" } | { kind: "ok" } | { kind: "error"; text: string };
 
 const field =
-  "mt-1.5 block min-h-12 w-full rounded-xl border border-line bg-paper px-4 py-3 text-ink " +
-  "placeholder:text-ink-soft/70 focus:border-sky-500";
+  "field mt-1.5 block min-h-12 w-full rounded-xl border border-line bg-paper px-4 py-3 text-ink " +
+  "placeholder:text-ink-soft/70";
 
 export function ContactForm() {
   // Hora em que o formulário apareceu (anti-bot). Lida no navegador, não na pré-renderização.
@@ -65,16 +66,29 @@ export function ContactForm() {
 
   if (status.kind === "ok") {
     return (
-      <div role="status" className="rounded-card bg-sky-100 p-6 text-navy-900">
-        <p className="font-display text-xl font-bold">Mensagem enviada.</p>
-        <p className="mt-1">Retornamos assim que possível.</p>
+      <div role="status" className="rounded-card border border-line bg-surface p-8 text-center shadow-card sm:p-10">
+        <span className="success-badge mx-auto grid size-20 place-items-center rounded-full bg-sky-100 text-sky-600">
+          <svg viewBox="0 0 24 24" className="size-10" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <path className="success-check" d="M5 12.5l4.5 4.5L19 7.5" />
+          </svg>
+        </span>
+        <p className="mt-6 font-display text-4xl font-bold text-navy-900">Mensagem enviada</p>
+        <p className="mx-auto mt-2 max-w-sm text-ink-soft">
+          Recebemos seu contato e vamos responder pelo e-mail ou telefone que você informou.
+        </p>
+        <div className="mt-7 flex flex-wrap justify-center gap-3">
+          <Button href={whatsappLink()}>Adiantar pelo WhatsApp</Button>
+          <Button variant="secondary" onClick={() => setStatus({ kind: "idle" })}>
+            Enviar outra mensagem
+          </Button>
+        </div>
       </div>
     );
   }
 
   const err = (id: keyof Errors) =>
     errors[id] ? (
-      <p id={`${id}-erro`} className="mt-1 text-sm font-medium text-red-700">
+      <p id={`${id}-erro`} className="mt-1.5 text-sm font-semibold text-red-700 dark:text-red-300">
         {errors[id]}
       </p>
     ) : null;
@@ -84,7 +98,7 @@ export function ContactForm() {
   });
 
   return (
-    <form onSubmit={onSubmit} noValidate className="space-y-5">
+    <form onSubmit={onSubmit} noValidate className="space-y-5 rounded-card border border-line bg-surface p-6 shadow-card sm:p-8">
       <div>
         <label htmlFor="name" className="font-semibold text-navy-900">Nome</label>
         <input id="name" name="name" autoComplete="name" required className={field} {...aria("name")} />
@@ -133,10 +147,13 @@ export function ContactForm() {
       <Turnstile />
 
       {status.kind === "error" && (
-        <p role="alert" className="rounded-xl bg-red-50 p-4 font-medium text-red-800">{status.text}</p>
+        <p role="alert" className="rounded-xl border border-red-300 bg-red-50 p-4 font-medium text-red-800 dark:border-red-400/40 dark:bg-red-950/40 dark:text-red-200">{status.text}</p>
       )}
-      <Button type="submit" disabled={status.kind === "sending"}>
-        {status.kind === "sending" ? "Enviando..." : "Enviar mensagem"}
+      <Button type="submit" size="lg" disabled={status.kind === "sending"} aria-busy={status.kind === "sending"}>
+        {status.kind === "sending" && (
+          <span aria-hidden className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+        )}
+        {status.kind === "sending" ? "Enviando" : "Enviar mensagem"}
       </Button>
     </form>
   );

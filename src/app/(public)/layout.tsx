@@ -1,6 +1,8 @@
+import { AssistantWidget } from "@/components/AssistantWidget";
 import { CookieBanner } from "@/components/layout/CookieBanner";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
+import { WhatsAppFab } from "@/components/WhatsAppFab";
 import { GlassFilter } from "@/components/ui/liquid-glass-button";
 
 /**
@@ -24,6 +26,9 @@ export default function PublicLayout({ children }: LayoutProps<"/">) {
         {children}
       </main>
       <Footer />
+      <WhatsAppFab />
+      {/* Assistente virtual (IA): só existe quando a chave da API está configurada no servidor. */}
+      {process.env.ANTHROPIC_API_KEY ? <AssistantWidget /> : null}
       <CookieBanner />
     </div>
   );
