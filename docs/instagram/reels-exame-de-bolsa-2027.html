@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Reels Exame de Bolsa</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* Tokens do site (src/app/globals.css). Vídeo 1080x1920, 16 s.
+     Cada frame é capturado parando todas as animações num tempo exato (ver render-reels.js). */
+  :root {
+    --navy-900:#001650; --navy-800:#032a6b; --sky-600:#0a68a8; --sky-500:#1b9be0; --sky-400:#4fd8ff;
+    --sky-200:#b5f3ff; --sky-100:#dff8ff; --sky-50:#f0fcff; --ink:#0b1a33; --ink-soft:#425576; --line:#d3e6f2;
+    --whatsapp:#0e7a3f;
+    --ease:cubic-bezier(.16,1,.3,1);
+    --shadow:0 2px 4px rgb(0 22 80/.06), 0 30px 60px -24px rgb(0 22 80/.35);
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#fff; font-family:"Figtree",system-ui,sans-serif; color:var(--ink); }
+  #stage { position:relative; width:1080px; height:1920px; overflow:hidden; background:#fff; }
+
+  /* ---------- Fundo vivo ---------- */
+  .halo { position:absolute; width:1400px; height:1400px; left:-160px; top:-200px; border-radius:50%;
+    background:radial-gradient(closest-side, var(--sky-100), rgb(223 248 255/.4) 55%, transparent);
+    animation:drift 16s ease-in-out both; }
+  @keyframes drift { 0%{transform:translate(0,0) scale(1)} 35%{transform:translate(120px,260px) scale(1.1)} 70%{transform:translate(-80px,700px) scale(.9)} 100%{transform:translate(60px,300px) scale(1.05)} }
+  .net { position:absolute; inset:0; opacity:.5; }
+  .net path { stroke-dasharray:1400; animation:draw 3s var(--ease) both; }
+  @keyframes draw { from{stroke-dashoffset:1400} to{stroke-dashoffset:0} }
+  .net circle { animation:pulse 1.6s ease-in-out infinite alternate; transform-box:fill-box; transform-origin:center; }
+  @keyframes pulse { from{opacity:.35; transform:scale(.7)} to{opacity:1; transform:scale(1.25)} }
+
+  /* ---------- Utilitários de entrada/saída ---------- */
+  .scene { position:absolute; inset:0; padding:0 90px; display:flex; flex-direction:column; justify-content:center; }
+  .in { animation:rise .8s var(--ease) both; animation-delay:calc(var(--d) * 1s); }
+  @keyframes rise { from{opacity:0; transform:translateY(80px)} to{opacity:1; transform:none} }
+  .pop { animation:pop .7s var(--ease) both; animation-delay:calc(var(--d) * 1s); }
+  @keyframes pop { from{opacity:0; transform:scale(.6)} to{opacity:1; transform:none} }
+  .slide { animation:slide .8s var(--ease) both; animation-delay:calc(var(--d) * 1s); }
+  @keyframes slide { from{opacity:0; transform:translateX(160px)} to{opacity:1; transform:none} }
+  .out { animation:out .45s cubic-bezier(.7,0,.84,0) both; animation-delay:calc(var(--o) * 1s); }
+  @keyframes out { to{opacity:0; transform:translateY(-120px) scale(.96); filter:blur(6px)} }
+  .w { display:inline-block; }
+
+  /* ---------- Cena 1: pergunta ---------- */
+  .s1 { align-items:center; text-align:center; }
+  .brainbig { height:620px; margin-bottom:40px; filter:drop-shadow(0 0 40px rgb(79 216 255/.7)); }
+  .brainbig img { height:100%; -webkit-mask-image:radial-gradient(ellipse closest-side,#000 78%,transparent 100%); mask-image:radial-gradient(ellipse closest-side,#000 78%,transparent 100%); animation:glow 1.2s ease-in-out infinite alternate; }
+  @keyframes glow { from{filter:brightness(1)} to{filter:brightness(1.18) saturate(1.3)} }
+  .q { font-family:"Barlow Condensed"; font-weight:700; color:var(--navy-900); font-size:150px; line-height:.95; }
+  .q .hl { color:var(--sky-500); font-size:210px; }
+
+  /* ---------- Cena 2: promessa ---------- */
+  .big { font-family:"Barlow Condensed"; font-weight:700; color:var(--navy-900); font-size:200px; line-height:.92; letter-spacing:-.01em; }
+  .mark { position:relative; color:var(--sky-500); display:inline-block; isolation:isolate; }
+  .mark::after { content:""; position:absolute; left:-6px; right:-6px; bottom:12px; height:34px; z-index:-1; border-radius:8px;
+    background:var(--sky-100); transform-origin:left; animation:sweep .7s var(--ease) both; animation-delay:5.15s; }
+  @keyframes sweep { from{transform:scaleX(0)} to{transform:scaleX(1)} }
+
+  /* ---------- Cena 3: informações ---------- */
+  .chip { align-self:flex-start; display:inline-flex; align-items:center; gap:14px; background:var(--navy-900); color:#fff;
+    font-weight:700; font-size:36px; padding:18px 34px 18px 26px; border-radius:999px; }
+  .chip i { width:18px; height:18px; border-radius:50%; background:var(--sky-400); box-shadow:0 0 0 9px rgb(79 216 255/.25); }
+  .title3 { font-family:"Barlow Condensed"; font-weight:700; color:var(--navy-900); font-size:150px; line-height:.95; margin:36px 0 56px; }
+  .title3 span { color:var(--sky-500); }
+  .date { background:var(--navy-900); color:#fff; border-radius:36px; padding:44px 50px; display:flex; align-items:center; gap:40px; box-shadow:var(--shadow); }
+  .date b { font-family:"Barlow Condensed"; font-weight:700; font-size:230px; line-height:.8; }
+  .date small { display:block; font-size:36px; font-weight:600; color:var(--sky-200); }
+  .date strong { display:block; font-family:"Barlow Condensed"; font-weight:700; font-size:88px; line-height:1; color:var(--sky-400); }
+  .row { margin-top:28px; background:#fff; border:3px solid var(--line); border-radius:32px; padding:34px 40px; display:flex; align-items:center; gap:30px; box-shadow:var(--shadow); }
+  .ico { flex:none; width:96px; height:96px; border-radius:26px; background:var(--sky-100); color:var(--sky-600); display:grid; place-items:center; }
+  .ico svg { width:50px; height:50px; }
+  .row p { font-size:32px; font-weight:600; color:var(--ink-soft); }
+  .row h3 { font-family:"Barlow Condensed"; font-weight:700; font-size:62px; line-height:1; color:var(--navy-900); }
+
+  /* ---------- Cena 4: chamada ---------- */
+  .s4 { align-items:center; text-align:center; }
+  .cta-t { font-family:"Barlow Condensed"; font-weight:700; color:var(--navy-900); font-size:190px; line-height:.92; }
+  .cta-t span { color:var(--sky-500); }
+  .cta-p { font-size:44px; color:var(--ink-soft); margin-top:34px; line-height:1.35; }
+  .cta-p b { color:var(--ink); }
+  .arrow { width:200px; height:200px; margin-top:60px; border-radius:50%; display:grid; place-items:center; color:#fff;
+    background:linear-gradient(135deg,var(--sky-500),var(--sky-600)); box-shadow:0 0 0 22px rgb(79 216 255/.18), var(--shadow); }
+  .arrow svg { width:96px; height:96px; animation:bounce .7s ease-in-out infinite alternate; }
+  @keyframes bounce { from{transform:translateY(-14px)} to{transform:translateY(18px)} }
+  .wa { margin-top:80px; display:flex; flex-direction:column; align-items:center; gap:14px; font-size:44px; font-weight:700; color:var(--navy-900); }
+  .wa span { display:flex; align-items:center; gap:16px; font-size:34px; font-weight:600; color:var(--ink-soft); }
+  .wa svg { width:46px; height:46px; color:var(--whatsapp); }
+
+  /* ---------- Cena 5: assinatura ---------- */
+  .s5 { align-items:center; text-align:center; }
+  .s5 .brainend { height:380px; filter:drop-shadow(0 0 36px rgb(79 216 255/.7)); }
+  .s5 .brainend img { height:100%; -webkit-mask-image:radial-gradient(ellipse closest-side,#000 78%,transparent 100%); mask-image:radial-gradient(ellipse closest-side,#000 78%,transparent 100%); }
+  .name { font-family:"Barlow Condensed"; font-weight:700; font-size:200px; letter-spacing:.04em; color:var(--navy-900); line-height:1; margin-top:30px; }
+  .tag { font-weight:700; font-size:34px; letter-spacing:.2em; color:var(--sky-600); text-transform:uppercase; }
+  .sum { margin-top:80px; display:inline-flex; gap:22px; font-family:"Barlow Condensed"; font-weight:600; font-size:56px; color:var(--navy-900);
+    border:3px solid var(--line); border-radius:999px; padding:18px 44px; background:#fff; }
+  .sum i { color:var(--sky-400); font-style:normal; }
+  .handle { margin-top:40px; font-size:40px; font-weight:700; color:var(--sky-600); }
+
+  /* Logo fixa e barra de progresso */
+  .logo { position:absolute; left:90px; top:120px; display:flex; align-items:center; gap:18px; animation:fadein .6s ease both 3.3s, fadeout .4s ease both 13.1s; }
+  @keyframes fadein { from{opacity:0} to{opacity:1} }
+  @keyframes fadeout { to{opacity:0} }
+  .logo img { height:80px; -webkit-mask-image:radial-gradient(ellipse closest-side,#000 80%,transparent 100%); mask-image:radial-gradient(ellipse closest-side,#000 80%,transparent 100%); }
+  .logo b { display:block; font-family:"Barlow Condensed"; font-weight:700; font-size:50px; letter-spacing:.04em; color:var(--navy-900); line-height:1; }
+  .logo small { display:block; font-weight:700; font-size:16px; letter-spacing:.18em; color:var(--sky-600); text-transform:uppercase; margin-top:4px; }
+  .bar { position:absolute; left:0; bottom:0; height:12px; width:100%; background:linear-gradient(90deg,var(--sky-400),var(--sky-500));
+    transform-origin:left; animation:prog 16s linear both; }
+  @keyframes prog { from{transform:scaleX(0)} to{transform:scaleX(1)} }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="halo"></div>
+  <svg class="net" viewBox="0 0 1080 1920" aria-hidden="true">
+    <g stroke="#9fd4f0" stroke-width="2.5" fill="none">
+      <path d="M-20 380 L180 300 L360 360 L520 250 L700 330 L900 260 L1100 340"/>
+      <path d="M-20 1620 L200 1560 L380 1660 L560 1580 L760 1680 L940 1600 L1100 1650"/>
+      <path d="M180 300 L240 160 M700 330 L760 180 M380 1660 L420 1800 M760 1680 L720 1820"/>
+    </g>
+    <g fill="#4fd8ff">
+      <circle cx="180" cy="300" r="9"/><circle cx="360" cy="360" r="7" style="animation-delay:-.4s"/><circle cx="520" cy="250" r="9" style="animation-delay:-.8s"/>
+      <circle cx="700" cy="330" r="7" style="animation-delay:-1.2s"/><circle cx="900" cy="260" r="9" style="animation-delay:-.6s"/>
+      <circle cx="240" cy="160" r="6"/><circle cx="760" cy="180" r="6" style="animation-delay:-1s"/>
+      <circle cx="200" cy="1560" r="9" style="animation-delay:-.3s"/><circle cx="380" cy="1660" r="7"/><circle cx="560" cy="1580" r="9" style="animation-delay:-.9s"/>
+      <circle cx="760" cy="1680" r="7" style="animation-delay:-1.3s"/><circle cx="940" cy="1600" r="9" style="animation-delay:-.5s"/>
+      <circle cx="420" cy="1800" r="6"/><circle cx="720" cy="1820" r="6" style="animation-delay:-.7s"/>
+    </g>
+  </svg>
+
+  <div class="logo"><img src="cerebro-2x.png" alt=""><div><b>SAPIENS</b><small>Curso de Biomédicas</small></div></div>
+
+  <!-- Cena 1 · 0 a 3,2 s -->
+  <section class="scene s1 out" style="--o:2.85">
+    <div class="brainbig pop" style="--d:.1"><img src="cerebro-2x.png" alt=""></div>
+    <p class="q">
+      <span class="w in" style="--d:.6">Vai</span> <span class="w in" style="--d:.75">prestar</span><br>
+      <span class="w hl pop" style="--d:1.05">Medicina</span><br>
+      <span class="w in" style="--d:1.5">em</span> <span class="w in" style="--d:1.62">2027?</span>
+    </p>
+  </section>
+
+  <!-- Cena 2 · 3,2 a 6,4 s -->
+  <section class="scene s2 out" style="--o:6.05">
+    <p class="big">
+      <span class="w in" style="--d:3.3">Uma</span> <span class="w in" style="--d:3.42">tarde</span><br>
+      <span class="w in" style="--d:3.54">de</span> <span class="w in" style="--d:3.66">prova.</span>
+    </p>
+    <p class="big" style="margin-top:70px">
+      <span class="w in" style="--d:4.3">Um</span> <span class="w in" style="--d:4.42">ano</span> <span class="w in" style="--d:4.54">de</span><br>
+      <span class="w in" style="--d:4.66">estudo</span><br>
+      <span class="mark pop" style="--d:4.95">com bolsa.</span>
+    </p>
+  </section>
+
+  <!-- Cena 3 · 6,4 a 10,4 s -->
+  <section class="scene s3 out" style="--o:10.05">
+    <span class="chip pop" style="--d:6.45"><i></i>Inscrições abertas</span>
+    <h2 class="title3 in" style="--d:6.65">Exame de Bolsa <span>2027</span></h2>
+    <div class="date slide" style="--d:7.2">
+      <b>25</b>
+      <div><small>Quarta-feira</small><strong>de novembro</strong></div>
+    </div>
+    <div class="row slide" style="--d:7.75">
+      <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+      <div><p>Horário</p><h3>14h30 às 17h30</h3></div>
+    </div>
+    <div class="row slide" style="--d:8.2">
+      <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></div>
+      <div><p>Local</p><h3>Shopping Avenida 28, 2º piso</h3></div>
+    </div>
+  </section>
+
+  <!-- Cena 4 · 10,4 a 13,4 s -->
+  <section class="scene s4 out" style="--o:13.05">
+    <p class="cta-t">
+      <span class="w in" style="--d:10.45; color:var(--navy-900)">Garanta</span><br>
+      <span class="w in" style="--d:10.6; color:var(--navy-900)">sua vaga</span><br>
+      <span class="w pop" style="--d:10.85">na prova</span>
+    </p>
+    <p class="cta-p in" style="--d:11.2">Inscrição pelo <b>link na legenda</b></p>
+    <div class="arrow pop" style="--d:11.45"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg></div>
+    <div class="wa in" style="--d:11.8">
+      <span><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3c-.2.3-.9.9-.9 2.2s.9 2.5 1 2.7c.1.2 1.8 2.8 4.4 3.9 1.6.7 2.3.8 3.1.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3z"/></svg>Dúvidas no WhatsApp</span>
+      (22) 99792-5771 · (22) 99944-0711
+    </div>
+  </section>
+
+  <!-- Cena 5 · 13,4 a 16 s -->
+  <section class="scene s5">
+    <div class="brainend pop" style="--d:13.4"><img src="cerebro-2x.png" alt=""></div>
+    <p class="name in" style="--d:13.7">SAPIENS</p>
+    <p class="tag in" style="--d:13.85">Curso de Biomédicas</p>
+    <p class="sum pop" style="--d:14.3">25/11 <i>·</i> 14h30 <i>·</i> Shopping Avenida 28</p>
+    <p class="handle in" style="--d:14.6">#VemProSapiens</p>
+  </section>
+
+  <div class="bar"></div>
+</div>
+</body>
+</html>
