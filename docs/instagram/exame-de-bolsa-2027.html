@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Exame de Bolsa 2027</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* Tokens do site (src/app/globals.css) */
+  :root {
+    --navy-950:#000d33; --navy-900:#001650; --navy-800:#032a6b; --navy-700:#044e95;
+    --sky-600:#0a68a8; --sky-500:#1b9be0; --sky-400:#4fd8ff; --sky-200:#b5f3ff; --sky-100:#dff8ff; --sky-50:#f0fcff;
+    --ink:#0b1a33; --ink-soft:#425576; --line:#d3e6f2; --whatsapp:#0e7a3f;
+    --shadow:0 2px 4px rgb(0 22 80/.06), 0 24px 48px -20px rgb(0 22 80/.32);
+    --card:0 1px 2px rgb(0 22 80/.06), 0 10px 28px -14px rgb(0 22 80/.18);
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html, body { background:#e9eef5; }
+  body { font-family:"Figtree", system-ui, sans-serif; color:var(--ink); }
+
+  .post {
+    position:relative; overflow:hidden; width:1080px; height:1350px;
+    background:#fff; padding:72px 80px 64px; display:flex; flex-direction:column;
+  }
+  .story { height:1920px; padding:150px 80px 150px; }
+
+  /* Fundo: rede neural suave + halo ciano atrás do cérebro */
+  .bg { position:absolute; inset:0; pointer-events:none; }
+  .halo { position:absolute; width:900px; height:900px; right:-330px; top:-260px; border-radius:50%;
+    background:radial-gradient(closest-side, var(--sky-100), rgb(223 248 255/.5) 55%, transparent); }
+  .story .halo { top:-120px; }
+  .brain { position:absolute; right:-190px; top:20px; height:560px; opacity:.6;
+    filter:drop-shadow(0 10px 30px rgb(27 155 224/.45)); }
+  .story .brain { top:120px; height:600px; right:-150px; }
+  .brain img { height:100%; width:auto; display:block;
+    -webkit-mask-image:radial-gradient(ellipse closest-side,#000 78%,transparent 100%);
+            mask-image:radial-gradient(ellipse closest-side,#000 78%,transparent 100%); }
+  .net { position:absolute; inset:0; opacity:.35; }
+
+  .content { position:relative; display:flex; flex-direction:column; height:100%; }
+
+  /* Logo */
+  .logo { display:flex; align-items:center; gap:16px; }
+  .logo img { height:64px; -webkit-mask-image:radial-gradient(ellipse closest-side,#000 80%,transparent 100%); mask-image:radial-gradient(ellipse closest-side,#000 80%,transparent 100%); filter:drop-shadow(0 4px 10px rgb(27 155 224/.4)); }
+  .logo b { display:block; font-family:"Barlow Condensed"; font-weight:700; font-size:40px; letter-spacing:.04em; line-height:1; color:var(--navy-900); text-transform:uppercase; }
+  .logo small { display:block; margin-top:4px; font-weight:700; font-size:13px; letter-spacing:.18em; color:var(--sky-600); text-transform:uppercase; }
+
+  .chip { display:inline-flex; align-items:center; gap:10px; align-self:flex-start; margin-top:84px;
+    background:var(--navy-900); color:#fff; font-weight:700; font-size:22px; padding:12px 22px 12px 18px; border-radius:999px; margin-top:64px; }
+  .chip i { width:12px; height:12px; border-radius:50%; background:var(--sky-400); box-shadow:0 0 0 6px rgb(79 216 255/.25); }
+  .story .chip { margin-top:120px; }
+
+  .eyebrow { display:flex; align-items:center; gap:14px; margin-top:32px; font-weight:700; font-size:30px; color:var(--sky-600); }
+  .eyebrow::before { content:""; width:40px; height:4px; border-radius:4px; background:var(--sky-400); }
+
+  h1 { font-family:"Barlow Condensed"; font-weight:700; color:var(--navy-900);
+    font-size:118px; line-height:.92; letter-spacing:-.01em; margin-top:14px; }
+  h1 em { font-style:normal; color:var(--sky-500); }
+  .story h1 { font-size:120px; }
+
+  .lead { margin-top:24px; font-size:30px; line-height:1.4; color:var(--ink-soft); max-width:780px; }
+  .lead strong { color:var(--ink); font-weight:700; }
+
+  /* Bloco de informações */
+  .info { margin-top:auto; display:grid; grid-template-columns:250px 1fr; gap:20px; }
+  .story .info { margin-top:96px; }
+  .date { background:var(--navy-900); color:#fff; border-radius:24px; padding:26px 28px; display:flex; flex-direction:column; justify-content:center; box-shadow:var(--shadow); }
+  .date span { font-weight:600; font-size:22px; color:var(--sky-200); }
+  .date b { font-family:"Barlow Condensed"; font-weight:700; font-size:118px; line-height:.9; margin-top:6px; }
+  .date strong { font-family:"Barlow Condensed"; font-weight:600; font-size:40px; line-height:1; color:var(--sky-400); }
+  .rows { background:#fff; border:2px solid var(--line); border-radius:24px; box-shadow:var(--card); padding:8px 30px; display:flex; flex-direction:column; justify-content:center; }
+  .row { display:flex; align-items:center; gap:20px; padding:20px 0; }
+  .row + .row { border-top:2px solid var(--line); }
+  .ico { flex:none; width:58px; height:58px; border-radius:16px; background:var(--sky-100); color:var(--sky-600); display:grid; place-items:center; }
+  .ico svg { width:30px; height:30px; }
+  .row p { font-size:20px; font-weight:600; color:var(--ink-soft); line-height:1.2; }
+  .row h3 { font-family:"Barlow Condensed"; font-weight:700; font-size:40px; line-height:1.05; color:var(--navy-900); }
+
+  /* Chamada */
+  .cta { margin-top:20px; display:flex; align-items:center; justify-content:space-between; gap:20px;
+    background:linear-gradient(100deg, var(--sky-600), var(--sky-500)); color:#fff; border-radius:24px; padding:26px 32px; box-shadow:var(--shadow); }
+  .cta h2 { font-family:"Barlow Condensed"; font-weight:700; font-size:50px; line-height:1; }
+  .cta p { font-size:22px; font-weight:500; margin-top:6px; color:#e6f7ff; }
+  .cta .arrow { flex:none; width:76px; height:76px; border-radius:50%; background:#fff; color:var(--sky-600); display:grid; place-items:center; }
+  .cta .arrow svg { width:38px; height:38px; }
+
+  .foot { margin-top:22px; display:flex; align-items:center; justify-content:space-between; font-size:22px; font-weight:600; color:var(--ink-soft); }
+  .wa { display:flex; align-items:center; gap:14px; }
+  .wa svg { width:30px; height:30px; color:var(--whatsapp); }
+  .wa b { color:var(--navy-900); font-weight:700; }
+  .story .foot { margin-top:auto; flex-direction:column; align-items:flex-start; gap:18px; font-size:28px; }
+  .story .wa svg { width:38px; height:38px; }
+</style>
+</head>
+<body>
+<div class="post" id="post">
+  <div class="bg">
+    <div class="halo"></div>
+    <svg class="net" viewBox="0 0 1080 1350" preserveAspectRatio="none" aria-hidden="true">
+      <g stroke="#b5dff5" stroke-width="1.5" fill="none">
+        <path d="M80 640 L240 560 L380 610 L520 520 M240 560 L300 440 M380 610 L470 700"/>
+        <path d="M640 560 L780 640 L930 600 L1040 680 M780 640 L820 760"/>
+      </g>
+      <g fill="#4fd8ff" opacity=".7">
+        <circle cx="80" cy="640" r="5"/><circle cx="240" cy="560" r="6"/><circle cx="380" cy="610" r="4"/>
+        <circle cx="520" cy="520" r="5"/><circle cx="300" cy="440" r="4"/><circle cx="470" cy="700" r="4"/>
+        <circle cx="640" cy="560" r="4"/><circle cx="780" cy="640" r="6"/><circle cx="930" cy="600" r="4"/>
+        <circle cx="1040" cy="680" r="5"/><circle cx="820" cy="760" r="4"/>
+      </g>
+    </svg>
+    <div class="brain"><img src="cerebro-2x.png" alt=""></div>
+  </div>
+
+  <div class="content">
+    <div class="logo">
+      <img src="cerebro-2x.png" alt="">
+      <div><b>Sapiens</b><small>Curso de Biomédicas</small></div>
+    </div>
+
+    <span class="chip"><i></i>Inscrições abertas</span>
+    <p class="eyebrow">Exame de Bolsa 2027</p>
+    <h1>Uma tarde de prova.<br>Um ano de estudo<br><em>com bolsa.</em></h1>
+    <p class="lead">Faça o Exame de Bolsa e comece 2027 no preparatório para <strong>Medicina, carreiras da saúde e ENEM.</strong></p>
+
+    <div class="info">
+      <div class="date">
+        <span>Quarta-feira</span>
+        <b>25</b>
+        <strong>de novembro</strong>
+      </div>
+      <div class="rows">
+        <div class="row">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+          <div><p>Horário</p><h3>14h30 às 17h30</h3></div>
+        </div>
+        <div class="row">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></div>
+          <div><p>Local</p><h3>Shopping Avenida 28, 2º piso</h3></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cta">
+      <div>
+        <h2 id="ctah">Inscreva-se pelo link na legenda</h2>
+        <p id="ctap">O formulário de inscrição está na descrição do post.</p>
+      </div>
+      <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg></div>
+    </div>
+
+    <div class="foot">
+      <div class="wa">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3c-.2.3-.9.9-.9 2.2s.9 2.5 1 2.7c.1.2 1.8 2.8 4.4 3.9 1.6.7 2.3.8 3.1.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3z"/></svg>
+        <span>Dúvidas: <b>(22) 99792-5771</b> · <b>(22) 99944-0711</b></span>
+      </div>
+      <span>@sapiensvestibulares</span>
+    </div>
+  </div>
+</div>
+<script>
+  if (new URLSearchParams(location.search).get("f") === "story") { document.getElementById("post").classList.add("story"); document.getElementById("ctah").textContent = "Inscreva-se pelo link"; document.getElementById("ctap").textContent = "Toque no link deste story e preencha o formulário."; }
+</script>
+</body>
+</html>
