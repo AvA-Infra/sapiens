@@ -12,7 +12,7 @@ const fs = require('fs');
   const p = await b.newPage({ viewport: { width: 1080, height: 1920 }, deviceScaleFactor: 1 });
   await p.goto(`file://${dir}/reels-exame-de-bolsa-2027.html`, { waitUntil: 'networkidle' });
   await p.evaluate(() => document.fonts.ready);
-  const FPS = 30, DUR = 16;
+  const FPS = 30, DUR = 31;
   const times = only || Array.from({ length: FPS * DUR }, (_, i) => i / FPS);
   for (let i = 0; i < times.length; i++) {
     await p.evaluate((ms) => document.getAnimations().forEach((a) => { a.pause(); a.currentTime = ms; }), times[i] * 1000);

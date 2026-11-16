@@ -5,197 +5,343 @@
 <title>Reels Exame de Bolsa</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  /* Tokens do site (src/app/globals.css). Vídeo 1080x1920, 16 s.
-     Cada frame é capturado parando todas as animações num tempo exato (ver render-reels.js). */
+  /* Reels 1080x1920 sincronizado com a narração (voz Thalita, Microsoft).
+     Toda a animação é montada em JS (Web Animations) a partir dos tempos de cada palavra (narracao/palavras.js).
+     tools/render-reels.js para as animações quadro a quadro e grava os frames. Abrir no navegador também toca (sem som). */
   :root {
     --navy-900:#001650; --navy-800:#032a6b; --sky-600:#0a68a8; --sky-500:#1b9be0; --sky-400:#4fd8ff;
     --sky-200:#b5f3ff; --sky-100:#dff8ff; --sky-50:#f0fcff; --ink:#0b1a33; --ink-soft:#425576; --line:#d3e6f2;
-    --whatsapp:#0e7a3f;
-    --ease:cubic-bezier(.16,1,.3,1);
+    --wa:#0e7a3f; --wa-2:#25d366;
     --shadow:0 2px 4px rgb(0 22 80/.06), 0 30px 60px -24px rgb(0 22 80/.35);
   }
+  @property --n { syntax:"<integer>"; inherits:false; initial-value:1; }
   * { box-sizing:border-box; margin:0; padding:0; }
   body { background:#fff; font-family:"Figtree",system-ui,sans-serif; color:var(--ink); }
   #stage { position:relative; width:1080px; height:1920px; overflow:hidden; background:#fff; }
+  #cam { position:absolute; inset:0; transform-origin:50% 45%; }
+  .abs { position:absolute; }
 
-  /* ---------- Fundo vivo ---------- */
-  .halo { position:absolute; width:1400px; height:1400px; left:-160px; top:-200px; border-radius:50%;
-    background:radial-gradient(closest-side, var(--sky-100), rgb(223 248 255/.4) 55%, transparent);
-    animation:drift 16s ease-in-out both; }
-  @keyframes drift { 0%{transform:translate(0,0) scale(1)} 35%{transform:translate(120px,260px) scale(1.1)} 70%{transform:translate(-80px,700px) scale(.9)} 100%{transform:translate(60px,300px) scale(1.05)} }
-  .net { position:absolute; inset:0; opacity:.5; }
-  .net path { stroke-dasharray:1400; animation:draw 3s var(--ease) both; }
-  @keyframes draw { from{stroke-dashoffset:1400} to{stroke-dashoffset:0} }
-  .net circle { animation:pulse 1.6s ease-in-out infinite alternate; transform-box:fill-box; transform-origin:center; }
-  @keyframes pulse { from{opacity:.35; transform:scale(.7)} to{opacity:1; transform:scale(1.25)} }
+  /* Fundo */
+  .halo { position:absolute; width:1500px; height:1500px; left:-210px; top:-300px; border-radius:50%;
+    background:radial-gradient(closest-side, var(--sky-100), rgb(223 248 255/.45) 55%, transparent); }
+  .net { position:absolute; inset:0; opacity:.45; }
+  .dot { position:absolute; border-radius:50%; background:var(--sky-400); }
+  .streak { position:absolute; top:0; left:0; width:260px; height:2400px; transform-origin:center;
+    background:linear-gradient(90deg, transparent, rgb(79 216 255/.22), rgb(255 255 255/.7), rgb(79 216 255/.22), transparent); opacity:0; }
 
-  /* ---------- Utilitários de entrada/saída ---------- */
-  .scene { position:absolute; inset:0; padding:0 90px; display:flex; flex-direction:column; justify-content:center; }
-  .in { animation:rise .8s var(--ease) both; animation-delay:calc(var(--d) * 1s); }
-  @keyframes rise { from{opacity:0; transform:translateY(80px)} to{opacity:1; transform:none} }
-  .pop { animation:pop .7s var(--ease) both; animation-delay:calc(var(--d) * 1s); }
-  @keyframes pop { from{opacity:0; transform:scale(.6)} to{opacity:1; transform:none} }
-  .slide { animation:slide .8s var(--ease) both; animation-delay:calc(var(--d) * 1s); }
-  @keyframes slide { from{opacity:0; transform:translateX(160px)} to{opacity:1; transform:none} }
-  .out { animation:out .45s cubic-bezier(.7,0,.84,0) both; animation-delay:calc(var(--o) * 1s); }
-  @keyframes out { to{opacity:0; transform:translateY(-120px) scale(.96); filter:blur(6px)} }
+  /* Cérebro que atravessa o vídeo todo */
+  #brain { position:absolute; left:0; top:0; height:560px; transform-origin:0 0; }
+  #brain img { height:100%; display:block; -webkit-mask-image:radial-gradient(ellipse closest-side,#000 78%,transparent 100%); mask-image:radial-gradient(ellipse closest-side,#000 78%,transparent 100%); }
+  #brainGlow { position:absolute; inset:-25%; border-radius:50%; background:radial-gradient(closest-side, rgb(79 216 255/.55), transparent); }
+  #wordmark { position:absolute; left:208px; top:158px; }
+  #wordmark b { display:block; font-family:"Barlow Condensed"; font-weight:700; font-size:54px; letter-spacing:.04em; color:var(--navy-900); line-height:1; }
+  #wordmark small { display:block; font-weight:700; font-size:17px; letter-spacing:.18em; color:var(--sky-600); text-transform:uppercase; margin-top:4px; }
+
+  .scene { position:absolute; inset:0; padding:300px 90px 0; display:flex; flex-direction:column; }
+  .center { align-items:center; text-align:center; }
   .w { display:inline-block; }
+  .disp { font-family:"Barlow Condensed"; font-weight:700; color:var(--navy-900); line-height:.93; letter-spacing:-.01em; }
+  .cy { color:var(--sky-500); }
 
-  /* ---------- Cena 1: pergunta ---------- */
-  .s1 { align-items:center; text-align:center; }
-  .brainbig { height:620px; margin-bottom:40px; filter:drop-shadow(0 0 40px rgb(79 216 255/.7)); }
-  .brainbig img { height:100%; -webkit-mask-image:radial-gradient(ellipse closest-side,#000 78%,transparent 100%); mask-image:radial-gradient(ellipse closest-side,#000 78%,transparent 100%); animation:glow 1.2s ease-in-out infinite alternate; }
-  @keyframes glow { from{filter:brightness(1)} to{filter:brightness(1.18) saturate(1.3)} }
-  .q { font-family:"Barlow Condensed"; font-weight:700; color:var(--navy-900); font-size:150px; line-height:.95; }
-  .q .hl { color:var(--sky-500); font-size:210px; }
-
-  /* ---------- Cena 2: promessa ---------- */
-  .big { font-family:"Barlow Condensed"; font-weight:700; color:var(--navy-900); font-size:200px; line-height:.92; letter-spacing:-.01em; }
-  .mark { position:relative; color:var(--sky-500); display:inline-block; isolation:isolate; }
-  .mark::after { content:""; position:absolute; left:-6px; right:-6px; bottom:12px; height:34px; z-index:-1; border-radius:8px;
-    background:var(--sky-100); transform-origin:left; animation:sweep .7s var(--ease) both; animation-delay:5.15s; }
-  @keyframes sweep { from{transform:scaleX(0)} to{transform:scaleX(1)} }
-
-  /* ---------- Cena 3: informações ---------- */
   .chip { align-self:flex-start; display:inline-flex; align-items:center; gap:14px; background:var(--navy-900); color:#fff;
-    font-weight:700; font-size:36px; padding:18px 34px 18px 26px; border-radius:999px; }
-  .chip i { width:18px; height:18px; border-radius:50%; background:var(--sky-400); box-shadow:0 0 0 9px rgb(79 216 255/.25); }
-  .title3 { font-family:"Barlow Condensed"; font-weight:700; color:var(--navy-900); font-size:150px; line-height:.95; margin:36px 0 56px; }
-  .title3 span { color:var(--sky-500); }
-  .date { background:var(--navy-900); color:#fff; border-radius:36px; padding:44px 50px; display:flex; align-items:center; gap:40px; box-shadow:var(--shadow); }
-  .date b { font-family:"Barlow Condensed"; font-weight:700; font-size:230px; line-height:.8; }
+    font-weight:700; font-size:36px; padding:18px 34px 18px 26px; border-radius:999px; box-shadow:var(--shadow); }
+  .center .chip { align-self:center; }
+  .chip i { position:relative; width:18px; height:18px; border-radius:50%; background:var(--sky-400); }
+  .chip i b { position:absolute; inset:0; border-radius:50%; border:3px solid var(--sky-400); }
+  .chip.live i, .chip.live i b { background:var(--wa-2); border-color:var(--wa-2); }
+
+  /* Cena 1 */
+  .s1 { padding-top:890px; }
+  .s1 .a { font-size:132px; }
+  .s1 .m { font-size:230px; color:var(--sky-500); line-height:.9; position:relative; }
+  .ring { position:absolute; left:50%; top:50%; width:300px; height:300px; margin:-150px 0 0 -150px; border-radius:50%; border:8px solid var(--sky-400); opacity:0; }
+
+  /* Cena 2 */
+  .s2 .big { font-size:168px; }
+  .s2 .small { font-family:"Figtree"; font-weight:600; font-size:52px; color:var(--ink-soft); margin:28px 0 20px; }
+  .mark { position:relative; display:inline-block; isolation:isolate; color:var(--sky-500); }
+  .mark .hl { position:absolute; left:-8px; right:-8px; bottom:14px; height:40px; z-index:-1; border-radius:10px; background:var(--sky-100); transform-origin:left; }
+  .spark { position:absolute; left:50%; top:50%; width:34px; height:34px; margin:-17px; color:var(--sky-400); opacity:0; }
+
+  /* Cena 3 */
+  .s3 .title { font-size:128px; margin:30px 0 44px; }
+  .card { position:relative; border-radius:34px; box-shadow:var(--shadow); overflow:hidden; }
+  .date { background:var(--navy-900); color:#fff; padding:38px 48px; display:flex; align-items:center; gap:40px; }
+  .date .num { font-family:"Barlow Condensed"; font-weight:700; font-size:220px; line-height:.8; min-width:220px; counter-reset:n var(--n); }
+  .date .num::after { content:counter(n); }
   .date small { display:block; font-size:36px; font-weight:600; color:var(--sky-200); }
-  .date strong { display:block; font-family:"Barlow Condensed"; font-weight:700; font-size:88px; line-height:1; color:var(--sky-400); }
-  .row { margin-top:28px; background:#fff; border:3px solid var(--line); border-radius:32px; padding:34px 40px; display:flex; align-items:center; gap:30px; box-shadow:var(--shadow); }
-  .ico { flex:none; width:96px; height:96px; border-radius:26px; background:var(--sky-100); color:var(--sky-600); display:grid; place-items:center; }
-  .ico svg { width:50px; height:50px; }
+  .date strong { display:block; font-family:"Barlow Condensed"; font-weight:700; font-size:86px; line-height:1; color:var(--sky-400); }
+  .row { margin-top:26px; background:#fff; border:3px solid var(--line); padding:32px 40px; display:flex; align-items:center; gap:30px; }
+  .ico { flex:none; position:relative; width:100px; height:100px; border-radius:28px; background:var(--sky-100); color:var(--sky-600); display:grid; place-items:center; }
+  .ico svg { width:54px; height:54px; overflow:visible; }
   .row p { font-size:32px; font-weight:600; color:var(--ink-soft); }
-  .row h3 { font-family:"Barlow Condensed"; font-weight:700; font-size:62px; line-height:1; color:var(--navy-900); }
+  .row h3 { font-family:"Barlow Condensed"; font-weight:700; font-size:64px; line-height:1; color:var(--navy-900); }
+  .flash { position:absolute; inset:0; border-radius:inherit; border:5px solid var(--sky-400); opacity:0; pointer-events:none; }
 
-  /* ---------- Cena 4: chamada ---------- */
-  .s4 { align-items:center; text-align:center; }
-  .cta-t { font-family:"Barlow Condensed"; font-weight:700; color:var(--navy-900); font-size:190px; line-height:.92; }
-  .cta-t span { color:var(--sky-500); }
-  .cta-p { font-size:44px; color:var(--ink-soft); margin-top:34px; line-height:1.35; }
-  .cta-p b { color:var(--ink); }
-  .arrow { width:200px; height:200px; margin-top:60px; border-radius:50%; display:grid; place-items:center; color:#fff;
-    background:linear-gradient(135deg,var(--sky-500),var(--sky-600)); box-shadow:0 0 0 22px rgb(79 216 255/.18), var(--shadow); }
-  .arrow svg { width:96px; height:96px; animation:bounce .7s ease-in-out infinite alternate; }
-  @keyframes bounce { from{transform:translateY(-14px)} to{transform:translateY(18px)} }
-  .wa { margin-top:80px; display:flex; flex-direction:column; align-items:center; gap:14px; font-size:44px; font-weight:700; color:var(--navy-900); }
-  .wa span { display:flex; align-items:center; gap:16px; font-size:34px; font-weight:600; color:var(--ink-soft); }
-  .wa svg { width:46px; height:46px; color:var(--whatsapp); }
+  /* Botões */
+  .btn { position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center; gap:22px; border-radius:999px;
+    font-weight:800; color:#fff; box-shadow:0 18px 40px -16px rgb(10 104 168/.7), inset 0 2px 0 rgb(255 255 255/.25); }
+  .btn-main { width:900px; height:150px; font-size:52px; background:linear-gradient(100deg,var(--sky-600),var(--sky-500)); }
+  .btn-wa { width:900px; height:140px; font-size:46px; background:linear-gradient(100deg,var(--wa),#16a34a); box-shadow:0 18px 40px -16px rgb(14 122 63/.7), inset 0 2px 0 rgb(255 255 255/.25); }
+  .btn svg { width:54px; height:54px; flex:none; }
+  .shine { position:absolute; top:-20%; left:0; width:160px; height:140%; background:linear-gradient(90deg,transparent,rgb(255 255 255/.55),transparent); transform:translateX(-300px) skewX(-20deg); }
+  .ripple { position:absolute; left:0; top:0; width:120px; height:120px; border-radius:50%; background:rgb(255 255 255/.55); opacity:0; }
+  .finger { position:absolute; left:0; top:0; width:110px; height:110px; border-radius:50%; background:rgb(255 255 255/.85); border:5px solid var(--navy-900);
+    box-shadow:0 14px 30px -8px rgb(0 22 80/.5); opacity:0; z-index:5; }
+  .s4 .big { font-size:170px; }
+  .s4 .sub { font-size:46px; color:var(--ink-soft); margin:26px 0 56px; }
+  .legenda { margin-top:36px; display:flex; align-items:center; gap:18px; font-size:44px; font-weight:700; color:var(--sky-600); }
+  .legenda svg { width:56px; height:56px; }
+  .nums { margin-top:22px; font-size:40px; font-weight:700; color:var(--navy-900); }
 
-  /* ---------- Cena 5: assinatura ---------- */
-  .s5 { align-items:center; text-align:center; }
-  .s5 .brainend { height:380px; filter:drop-shadow(0 0 36px rgb(79 216 255/.7)); }
-  .s5 .brainend img { height:100%; -webkit-mask-image:radial-gradient(ellipse closest-side,#000 78%,transparent 100%); mask-image:radial-gradient(ellipse closest-side,#000 78%,transparent 100%); }
-  .name { font-family:"Barlow Condensed"; font-weight:700; font-size:200px; letter-spacing:.04em; color:var(--navy-900); line-height:1; margin-top:30px; }
-  .tag { font-weight:700; font-size:34px; letter-spacing:.2em; color:var(--sky-600); text-transform:uppercase; }
-  .sum { margin-top:80px; display:inline-flex; gap:22px; font-family:"Barlow Condensed"; font-weight:600; font-size:56px; color:var(--navy-900);
-    border:3px solid var(--line); border-radius:999px; padding:18px 44px; background:#fff; }
-  .sum i { color:var(--sky-400); font-style:normal; }
-  .handle { margin-top:40px; font-size:40px; font-weight:700; color:var(--sky-600); }
+  /* Cena 5 */
+  .s5 { padding-top:790px; }
+  .s5 .name { font-family:"Barlow Condensed"; font-weight:700; font-size:210px; letter-spacing:.05em; color:var(--navy-900); line-height:1; }
+  .s5 .tag { font-weight:700; font-size:36px; letter-spacing:.22em; color:var(--sky-600); text-transform:uppercase; margin-top:6px; }
+  .s5 .pill { margin-top:70px; position:relative; overflow:hidden; display:inline-flex; font-family:"Barlow Condensed"; font-weight:700; font-size:80px; color:#fff;
+    background:linear-gradient(100deg,var(--navy-900),var(--navy-800)); padding:18px 56px; border-radius:999px; box-shadow:var(--shadow); }
+  .s5 .pill span { color:var(--sky-400); }
+  .s5 .sum { margin-top:44px; font-family:"Barlow Condensed"; font-weight:600; font-size:54px; color:var(--navy-900); }
+  .s5 .sum i { font-style:normal; color:var(--sky-500); }
 
-  /* Logo fixa e barra de progresso */
-  .logo { position:absolute; left:90px; top:120px; display:flex; align-items:center; gap:18px; animation:fadein .6s ease both 3.3s, fadeout .4s ease both 13.1s; }
-  @keyframes fadein { from{opacity:0} to{opacity:1} }
-  @keyframes fadeout { to{opacity:0} }
-  .logo img { height:80px; -webkit-mask-image:radial-gradient(ellipse closest-side,#000 80%,transparent 100%); mask-image:radial-gradient(ellipse closest-side,#000 80%,transparent 100%); }
-  .logo b { display:block; font-family:"Barlow Condensed"; font-weight:700; font-size:50px; letter-spacing:.04em; color:var(--navy-900); line-height:1; }
-  .logo small { display:block; font-weight:700; font-size:16px; letter-spacing:.18em; color:var(--sky-600); text-transform:uppercase; margin-top:4px; }
-  .bar { position:absolute; left:0; bottom:0; height:12px; width:100%; background:linear-gradient(90deg,var(--sky-400),var(--sky-500));
-    transform-origin:left; animation:prog 16s linear both; }
-  @keyframes prog { from{transform:scaleX(0)} to{transform:scaleX(1)} }
+  /* Legenda palavra por palavra */
+  #caps { position:absolute; left:0; right:0; top:1440px; height:120px; }
+  .cap { position:absolute; left:50%; top:0; transform:translateX(-50%); white-space:nowrap; display:flex; gap:14px;
+    background:rgb(255 255 255/.92); border:3px solid var(--line); border-radius:28px; padding:14px 26px; box-shadow:var(--shadow);
+    font-weight:800; font-size:48px; color:var(--navy-900); opacity:0; }
+  .cap span { padding:2px 12px; border-radius:14px; }
+
+  .bar { position:absolute; left:0; bottom:0; height:12px; width:100%; background:linear-gradient(90deg,var(--sky-400),var(--sky-500)); transform-origin:left; }
 </style>
 </head>
 <body>
-<div id="stage">
-  <div class="halo"></div>
+<div id="stage"><div id="cam">
+  <div class="halo" id="halo"></div>
   <svg class="net" viewBox="0 0 1080 1920" aria-hidden="true">
-    <g stroke="#9fd4f0" stroke-width="2.5" fill="none">
-      <path d="M-20 380 L180 300 L360 360 L520 250 L700 330 L900 260 L1100 340"/>
-      <path d="M-20 1620 L200 1560 L380 1660 L560 1580 L760 1680 L940 1600 L1100 1650"/>
-      <path d="M180 300 L240 160 M700 330 L760 180 M380 1660 L420 1800 M760 1680 L720 1820"/>
-    </g>
-    <g fill="#4fd8ff">
-      <circle cx="180" cy="300" r="9"/><circle cx="360" cy="360" r="7" style="animation-delay:-.4s"/><circle cx="520" cy="250" r="9" style="animation-delay:-.8s"/>
-      <circle cx="700" cy="330" r="7" style="animation-delay:-1.2s"/><circle cx="900" cy="260" r="9" style="animation-delay:-.6s"/>
-      <circle cx="240" cy="160" r="6"/><circle cx="760" cy="180" r="6" style="animation-delay:-1s"/>
-      <circle cx="200" cy="1560" r="9" style="animation-delay:-.3s"/><circle cx="380" cy="1660" r="7"/><circle cx="560" cy="1580" r="9" style="animation-delay:-.9s"/>
-      <circle cx="760" cy="1680" r="7" style="animation-delay:-1.3s"/><circle cx="940" cy="1600" r="9" style="animation-delay:-.5s"/>
-      <circle cx="420" cy="1800" r="6"/><circle cx="720" cy="1820" r="6" style="animation-delay:-.7s"/>
+    <g stroke="#9fd4f0" stroke-width="2.5" fill="none" id="netlines">
+      <path d="M-20 250 L180 190 L360 240 L520 150 L700 220 L900 160 L1100 230"/>
+      <path d="M-20 1700 L200 1650 L380 1740 L560 1670 L760 1760 L940 1690 L1100 1730"/>
+      <path d="M180 190 L240 70 M700 220 L760 90 M380 1740 L420 1870 M760 1760 L720 1890"/>
     </g>
   </svg>
+  <div id="dots"></div>
+  <div class="streak" id="streak"></div>
 
-  <div class="logo"><img src="cerebro-2x.png" alt=""><div><b>SAPIENS</b><small>Curso de Biomédicas</small></div></div>
-
-  <!-- Cena 1 · 0 a 3,2 s -->
-  <section class="scene s1 out" style="--o:2.85">
-    <div class="brainbig pop" style="--d:.1"><img src="cerebro-2x.png" alt=""></div>
-    <p class="q">
-      <span class="w in" style="--d:.6">Vai</span> <span class="w in" style="--d:.75">prestar</span><br>
-      <span class="w hl pop" style="--d:1.05">Medicina</span><br>
-      <span class="w in" style="--d:1.5">em</span> <span class="w in" style="--d:1.62">2027?</span>
-    </p>
+  <!-- Cena 1 -->
+  <section class="scene s1 center" id="s1">
+    <p class="disp a"><span class="w" id="s1w0">Vai</span> <span class="w" id="s1w1">prestar</span></p>
+    <p class="disp m"><span class="ring" id="ring"></span><span class="ring" id="ring2"></span><span class="w" id="s1w2">Medicina</span></p>
+    <p class="disp a"><span class="w" id="s1w3">em 2027?</span></p>
   </section>
 
-  <!-- Cena 2 · 3,2 a 6,4 s -->
-  <section class="scene s2 out" style="--o:6.05">
-    <p class="big">
-      <span class="w in" style="--d:3.3">Uma</span> <span class="w in" style="--d:3.42">tarde</span><br>
-      <span class="w in" style="--d:3.54">de</span> <span class="w in" style="--d:3.66">prova.</span>
-    </p>
-    <p class="big" style="margin-top:70px">
-      <span class="w in" style="--d:4.3">Um</span> <span class="w in" style="--d:4.42">ano</span> <span class="w in" style="--d:4.54">de</span><br>
-      <span class="w in" style="--d:4.66">estudo</span><br>
-      <span class="mark pop" style="--d:4.95">com bolsa.</span>
-    </p>
+  <!-- Cena 2 -->
+  <section class="scene s2" id="s2">
+    <span class="chip" id="s2chip"><i><b></b></i>Presta atenção</span>
+    <p class="disp big" style="margin-top:40px"><span class="w" id="s2w3">Uma</span> <span class="w" id="s2w4">tarde</span><br><span class="w" id="s2w5">de</span> <span class="w" id="s2w6">prova.</span></p>
+    <p class="small" id="s2small">pode virar</p>
+    <p class="disp big"><span class="w" id="s2w9">um</span> <span class="w" id="s2w10">ano</span> <span class="w" id="s2w11">inteiro</span><br><span class="w" id="s2w12">de</span> <span class="w" id="s2w13">estudo</span><br>
+      <span class="mark" id="s2mark"><span class="hl" id="s2hl"></span>com bolsa.<span id="sparks"></span></span></p>
   </section>
 
-  <!-- Cena 3 · 6,4 a 10,4 s -->
-  <section class="scene s3 out" style="--o:10.05">
-    <span class="chip pop" style="--d:6.45"><i></i>Inscrições abertas</span>
-    <h2 class="title3 in" style="--d:6.65">Exame de Bolsa <span>2027</span></h2>
-    <div class="date slide" style="--d:7.2">
-      <b>25</b>
+  <!-- Cena 3 -->
+  <section class="scene s3" id="s3">
+    <span class="chip" id="s3chip"><i><b></b></i>Inscrições abertas</span>
+    <h2 class="disp title" id="s3title">Exame de Bolsa <span class="cy">2027</span></h2>
+    <div class="card date" id="c-date">
+      <span class="num" id="num"></span>
       <div><small>Quarta-feira</small><strong>de novembro</strong></div>
+      <span class="flash" id="f-date"></span>
     </div>
-    <div class="row slide" style="--d:7.75">
-      <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+    <div class="card row" id="c-time">
+      <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><line id="hand" x1="12" y1="12" x2="12" y2="6.5" style="transform-origin:12px 12px"/><line x1="12" y1="12" x2="15" y2="13.5"/></svg></div>
       <div><p>Horário</p><h3>14h30 às 17h30</h3></div>
+      <span class="flash" id="f-time"></span>
     </div>
-    <div class="row slide" style="--d:8.2">
-      <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></div>
+    <div class="card row" id="c-loc">
+      <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><g id="pin"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></g></svg></div>
       <div><p>Local</p><h3>Shopping Avenida 28, 2º piso</h3></div>
+      <span class="flash" id="f-loc"></span>
     </div>
   </section>
 
-  <!-- Cena 4 · 10,4 a 13,4 s -->
-  <section class="scene s4 out" style="--o:13.05">
-    <p class="cta-t">
-      <span class="w in" style="--d:10.45; color:var(--navy-900)">Garanta</span><br>
-      <span class="w in" style="--d:10.6; color:var(--navy-900)">sua vaga</span><br>
-      <span class="w pop" style="--d:10.85">na prova</span>
-    </p>
-    <p class="cta-p in" style="--d:11.2">Inscrição pelo <b>link na legenda</b></p>
-    <div class="arrow pop" style="--d:11.45"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg></div>
-    <div class="wa in" style="--d:11.8">
-      <span><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3c-.2.3-.9.9-.9 2.2s.9 2.5 1 2.7c.1.2 1.8 2.8 4.4 3.9 1.6.7 2.3.8 3.1.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3z"/></svg>Dúvidas no WhatsApp</span>
-      (22) 99792-5771 · (22) 99944-0711
+  <!-- Cena 4 -->
+  <section class="scene s4 center" id="s4">
+    <p class="disp big"><span class="w" id="s4a">Inscrições</span><br><span class="w cy" id="s4b">abertas!</span></p>
+    <p class="sub" id="s4sub">Leva só um formulário.</p>
+    <div class="btn btn-main" id="btnMain">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      <span>Quero fazer a prova</span><span class="shine" id="shine1"></span><span class="ripple" id="rip1"></span>
     </div>
+    <p class="legenda" id="s4leg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" id="arrowDown"><path d="M12 5v14M6 13l6 6 6-6"/></svg>Link na legenda</p>
+    <div class="btn btn-wa" id="btnWa" style="margin-top:60px">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3c-.2.3-.9.9-.9 2.2s.9 2.5 1 2.7c.1.2 1.8 2.8 4.4 3.9 1.6.7 2.3.8 3.1.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3z"/></svg>
+      <span>Chamar no WhatsApp</span><span class="shine" id="shine2"></span><span class="ripple" id="rip2"></span>
+    </div>
+    <p class="nums" id="s4nums">(22) 99792-5771 · (22) 99944-0711</p>
+    <span class="finger" id="finger"></span>
   </section>
 
-  <!-- Cena 5 · 13,4 a 16 s -->
-  <section class="scene s5">
-    <div class="brainend pop" style="--d:13.4"><img src="cerebro-2x.png" alt=""></div>
-    <p class="name in" style="--d:13.7">SAPIENS</p>
-    <p class="tag in" style="--d:13.85">Curso de Biomédicas</p>
-    <p class="sum pop" style="--d:14.3">25/11 <i>·</i> 14h30 <i>·</i> Shopping Avenida 28</p>
-    <p class="handle in" style="--d:14.6">#VemProSapiens</p>
+  <!-- Cena 5 -->
+  <section class="scene s5 center" id="s5">
+    <p class="name" id="s5name"></p>
+    <p class="tag" id="s5tag">Curso de Biomédicas</p>
+    <div class="pill" id="s5pill">#VemPro<span>Sapiens</span><span class="shine" id="shine3"></span></div>
+    <p class="sum" id="s5sum">25/11 <i>·</i> 14h30 <i>·</i> Shopping Avenida 28</p>
   </section>
 
-  <div class="bar"></div>
+  <div id="brain"><div id="brainGlow"></div><img src="cerebro-2x.png" alt=""></div>
+  <div id="wordmark"><b>SAPIENS</b><small>Curso de Biomédicas</small></div>
+  <div id="caps"></div>
 </div>
+<div class="bar" id="bar"></div>
+</div>
+
+<script src="narracao/palavras.js"></script>
+<script>
+/* ---------- Linha do tempo ---------- */
+const S = [0.3, 3.45, 8.75, 17.75, 25.55];   // início de cada fala (s); precisa bater com tools/montar-audio
+const END = 31;
+const W = window.WORDS;
+const wt = (s, i) => S[s] + W[s][i][1];      // momento em que a palavra i da cena s começa
+const $ = (id) => document.getElementById(id);
+const EASE = "cubic-bezier(.16,1,.3,1)", EASE_IN = "cubic-bezier(.7,0,.84,0)", SPRING = "cubic-bezier(.34,1.56,.64,1)";
+
+function A(el, t, kf, dur = .8, easing = EASE, fill = "both", extra = {}) {
+  if (typeof el === "string") el = $(el);
+  return el.animate(kf, { delay: t * 1000, duration: dur * 1000, easing, fill, ...extra });
+}
+const IN = {
+  up:   [{ opacity: 0, transform: "translateY(90px)", filter: "blur(10px)" }, { opacity: 1, transform: "none", filter: "blur(0)" }],
+  pop:  [{ opacity: 0, transform: "scale(.4)" }, { opacity: 1, transform: "none" }],
+  punch:[{ opacity: 0, transform: "scale(1.9)", filter: "blur(14px)" }, { opacity: 1, transform: "none", filter: "blur(0)" }],
+  left: [{ opacity: 0, transform: "translateX(220px)", filter: "blur(8px)" }, { opacity: 1, transform: "none", filter: "blur(0)" }],
+};
+const inn = (el, t, k = "up", d = .8, e = EASE) => A(el, t, IN[k], d, e);
+// Saída fica só com fill "forwards" para não sobrescrever a entrada antes da hora.
+const out = (el, t, k = "zoom") => A(el, t, {
+  zoom: [{ opacity: 1, transform: "none", filter: "blur(0)" }, { opacity: 0, transform: "scale(1.08)", filter: "blur(16px)" }],
+  left: [{ opacity: 1, transform: "none", filter: "blur(0)" }, { opacity: 0, transform: "translateX(-260px)", filter: "blur(12px)" }],
+  down: [{ opacity: 1, transform: "none", filter: "blur(0)" }, { opacity: 0, transform: "scale(.9)", filter: "blur(16px)" }],
+}[k], .5, EASE_IN, "forwards");
+
+/* ---------- Fundo vivo ---------- */
+let seed = 7; const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+for (let i = 0; i < 34; i++) {
+  const d = document.createElement("span"); d.className = "dot";
+  const s = 6 + rnd() * 12; Object.assign(d.style, { width: s + "px", height: s + "px", left: rnd() * 1080 + "px", top: rnd() * 1920 + "px" });
+  $("dots").appendChild(d);
+  const dx = (rnd() - .5) * 160, dy = -80 - rnd() * 200;
+  A(d, -rnd() * 6, [{ opacity: 0, transform: "translate(0,0)" }, { opacity: .7, offset: .3 }, { opacity: .7, offset: .7 }, { opacity: 0, transform: `translate(${dx}px,${dy}px)` }], 5 + rnd() * 4, "ease-in-out", "both", { iterations: Infinity });
+}
+document.querySelectorAll("#netlines path").forEach((p, i) => { p.style.strokeDasharray = 1500; A(p, .2 + i * .3, [{ strokeDashoffset: 1500 }, { strokeDashoffset: 0 }], 3); });
+A("halo", 0, [{ transform: "translate(0,0) scale(1)" }, { transform: "translate(140px,380px) scale(1.12)" }, { transform: "translate(-120px,820px) scale(.92)" }, { transform: "translate(40px,260px) scale(1.06)" }], END, "ease-in-out");
+A("cam", 0, [{ transform: "scale(1)" }, { transform: "scale(1.035)" }], END, "linear");
+A("bar", 0, [{ transform: "scaleX(0)" }, { transform: "scaleX(1)" }], END, "linear");
+// Faixa de luz atravessando nas trocas de cena
+[S[1] - .2, S[2] - .2, S[3] - .2, S[4] - .2].forEach((t) =>
+  A("streak", t, [{ opacity: 0, transform: "translateX(-500px) rotate(18deg)" }, { opacity: 1, offset: .3 }, { opacity: 0, transform: "translateX(1400px) rotate(18deg)" }], .8, "ease-in-out", "none"));
+
+/* ---------- Cérebro (um só elemento que viaja entre as cenas) ---------- */
+// base: 445x560. Centro grande -> logo no canto -> centro no fim.
+const BIG = "translate(318px,300px) scale(1)", LOGO = "translate(90px,140px) scale(.19)", END_POS = "translate(373px,330px) scale(.76)";
+A("brain", 0, [{ opacity: 0, transform: "translate(318px,420px) scale(.5)" }, { opacity: 1, transform: BIG }], 1.1, SPRING);
+A("brain", S[1] - .35, [{ transform: BIG }, { transform: LOGO }], .9, EASE, "forwards");
+A("brain", S[4] - .3, [{ transform: LOGO }, { transform: END_POS }], 1, EASE, "forwards");
+A("brainGlow", 0, [{ opacity: .3, transform: "scale(.9)" }, { opacity: 1, transform: "scale(1.1)" }], .9, "ease-in-out", "both", { iterations: Infinity, direction: "alternate" });
+A("wordmark", S[1] + .25, [{ opacity: 0, transform: "translateX(-30px)" }, { opacity: 1, transform: "none" }], .6);
+A("wordmark", S[4] - .4, [{ opacity: 1 }, { opacity: 0 }], .3, "linear", "forwards");
+
+/* ---------- Cena 1 ---------- */
+inn("s1w0", wt(0, 0) - .05); inn("s1w1", wt(0, 1) - .05);
+inn("s1w2", wt(0, 2) - .05, "punch", .55);
+A("cam", wt(0, 2) + .3, [{ translate: "0 0" }, { translate: "-10px 6px" }, { translate: "9px -7px" }, { translate: "-5px 4px" }, { translate: "0 0" }], .3, "linear", "none");
+["ring", "ring2"].forEach((r, i) => A(r, wt(0, 2) + .3 + i * .12, [{ opacity: .9, transform: "scale(.3)" }, { opacity: 0, transform: "scale(3.2)" }], .9, "ease-out", "none"));
+inn("s1w3", wt(0, 3) - .05, "up");
+out("s1", S[1] - .4);
+
+/* ---------- Cena 2 ---------- */
+inn("s2chip", wt(1, 0) - .1, "pop", .6, SPRING);
+A(document.querySelector("#s2chip i b"), wt(1, 0), [{ opacity: 1, transform: "scale(1)" }, { opacity: 0, transform: "scale(3)" }], 1, "ease-out", "none", { iterations: 4 });
+[3, 4, 5, 6].forEach((i) => inn(`s2w${i}`, wt(1, i) - .08));
+inn("s2small", wt(1, 7) - .08, "up", .6);
+[9, 10, 11, 12, 13].forEach((i) => inn(`s2w${i}`, wt(1, i) - .08));
+inn("s2mark", wt(1, 14) - .08, "punch", .55);
+A("s2hl", wt(1, 15) + .1, [{ transform: "scaleX(0)" }, { transform: "scaleX(1)" }], .6);
+for (let i = 0; i < 12; i++) {           // faíscas saindo do "com bolsa"
+  const sp = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  sp.setAttribute("viewBox", "0 0 24 24"); sp.setAttribute("class", "spark");
+  sp.innerHTML = '<path fill="currentColor" d="M12 0l2.6 9.4L24 12l-9.4 2.6L12 24l-2.6-9.4L0 12l9.4-2.6z"/>';
+  $("sparks").appendChild(sp);
+  const ang = (i / 12) * Math.PI * 2, r = 260 + (i % 3) * 70;
+  A(sp, wt(1, 15) + .05, [{ opacity: 1, transform: "translate(0,0) scale(.2) rotate(0)" }, { opacity: 1, offset: .5 }, { opacity: 0, transform: `translate(${Math.cos(ang) * r * 1.4}px,${Math.sin(ang) * r * .7}px) scale(${.8 + (i % 3) * .3}) rotate(180deg)` }], 1.1, "ease-out", "none");
+}
+out("s2", S[2] - .4, "left");
+
+/* ---------- Cena 3 ---------- */
+inn("s3chip", wt(2, 0) - .1, "pop", .6, SPRING);
+A(document.querySelector("#s3chip i b"), wt(2, 0), [{ opacity: 1, transform: "scale(1)" }, { opacity: 0, transform: "scale(3)" }], 1, "ease-out", "none", { iterations: 8 });
+inn("s3title", wt(2, 1) - .1);
+inn("c-date", wt(2, 8) - .1, "left", .8);
+A("num", wt(2, 10) - .2, [{ "--n": 1 }, { "--n": 25 }], .9, "cubic-bezier(.2,.8,.3,1)");
+A("f-date", wt(2, 10) + .7, [{ opacity: 1, transform: "scale(1)" }, { opacity: 0, transform: "scale(1.06)" }], .7, "ease-out", "none");
+inn("c-time", wt(2, 11) - .1, "left", .8);
+A("hand", wt(2, 11) + .1, [{ transform: "rotate(0)" }, { transform: "rotate(720deg)" }], 1.6, EASE);
+A("f-time", wt(2, 13) + .4, [{ opacity: 1, transform: "scale(1)" }, { opacity: 0, transform: "scale(1.06)" }], .7, "ease-out", "none");
+inn("c-loc", wt(2, 21) - .1, "left", .8);
+A("pin", wt(2, 21) + .2, [{ transform: "translateY(-14px)" }, { transform: "translateY(0)" }, { transform: "translateY(-5px)" }, { transform: "translateY(0)" }], .8, "ease-out", "both", { iterations: 1 });
+A("f-loc", wt(2, 26) + .1, [{ opacity: 1, transform: "scale(1)" }, { opacity: 0, transform: "scale(1.06)" }], .7, "ease-out", "none");
+out("s3", S[3] - .4);
+
+/* ---------- Cena 4: botões com toque ---------- */
+inn("s4a", wt(3, 0) - .1, "up"); inn("s4b", wt(3, 3) - .1, "punch", .55);
+inn("s4sub", wt(3, 4) - .1);
+inn("btnMain", wt(3, 5) - .1, "pop", .7, SPRING);
+A("shine1", wt(3, 5) + .4, [{ transform: "translateX(-300px) skewX(-20deg)" }, { transform: "translateX(1100px) skewX(-20deg)" }], 1, "ease-in-out", "none", { iterations: 3, endDelay: 400 });
+// dedo entra, toca o botão principal, depois o do WhatsApp
+const tap1 = wt(3, 7) + .2, tap2 = wt(3, 14) + .1;
+A("finger", tap1 - .6, [{ opacity: 0, transform: "translate(760px,960px) scale(1.3)" }, { opacity: 1, transform: "translate(620px,770px) scale(1)" }], .6, EASE, "both");
+A("finger", tap1, [{ transform: "translate(620px,770px) scale(1)" }, { transform: "translate(620px,770px) scale(.75)" }, { transform: "translate(620px,770px) scale(1)" }], .3, "ease-in-out", "none");
+A("btnMain", tap1, [{ transform: "scale(1)" }, { transform: "scale(.94)" }, { transform: "scale(1)" }], .3, "ease-in-out", "none");
+A("rip1", tap1 + .05, [{ opacity: .9, transform: "translate(560px,10px) scale(.2)" }, { opacity: 0, transform: "translate(560px,10px) scale(9)" }], .7, "ease-out", "none");
+inn("s4leg", wt(3, 10) - .1, "up", .6);
+A("arrowDown", wt(3, 10) + .3, [{ transform: "translateY(-8px)" }, { transform: "translateY(10px)" }], .4, "ease-in-out", "none", { iterations: 8, direction: "alternate" });
+inn("btnWa", wt(3, 11) - .1, "pop", .7, SPRING);
+inn("s4nums", wt(3, 12) - .1, "up", .6);
+A("finger", wt(3, 12), [{ transform: "translate(620px,770px) scale(1)" }, { transform: "translate(640px,1075px) scale(1)" }], .7, EASE, "forwards");
+A("finger", tap2, [{ transform: "translate(640px,1075px) scale(1)" }, { transform: "translate(640px,1075px) scale(.75)" }, { transform: "translate(640px,1075px) scale(1)" }], .3, "ease-in-out", "none");
+A("btnWa", tap2, [{ transform: "scale(1)" }, { transform: "scale(.94)" }, { transform: "scale(1)" }], .3, "ease-in-out", "none");
+A("rip2", tap2 + .05, [{ opacity: .9, transform: "translate(580px,10px) scale(.2)" }, { opacity: 0, transform: "translate(580px,10px) scale(9)" }], .7, "ease-out", "none");
+A("shine2", tap2 + .3, [{ transform: "translateX(-300px) skewX(-20deg)" }, { transform: "translateX(1100px) skewX(-20deg)" }], 1, "ease-in-out", "none");
+A("finger", tap2 + .5, [{ opacity: 1 }, { opacity: 0 }], .4, "linear", "forwards");
+out("s4", S[4] - .4, "down");
+
+/* ---------- Cena 5: assinatura ---------- */
+"SAPIENS".split("").forEach((ch, i) => {
+  const s = document.createElement("span"); s.className = "w"; s.textContent = ch; $("s5name").appendChild(s);
+  inn(s, wt(4, 0) - .1 + i * .05, "up", .7);
+});
+inn("s5tag", wt(4, 1) - .05);
+inn("s5pill", wt(4, 4) - .1, "pop", .7, SPRING);
+A("shine3", wt(4, 4) + .5, [{ transform: "translateX(-300px) skewX(-20deg)" }, { transform: "translateX(1100px) skewX(-20deg)" }], 1, "ease-in-out", "none", { iterations: 2, endDelay: 300 });
+inn("s5sum", wt(4, 4) + .5);
+
+/* ---------- Legenda karaokê ---------- */
+W.forEach((words, s) => {
+  const end = s + 1 < S.length ? S[s + 1] - .3 : END;
+  const chunks = []; let cur = [];
+  words.forEach((w) => { cur.push(w); if (cur.length >= 4 || cur.map((x) => x[0]).join(" ").length > 20) { chunks.push(cur); cur = []; } });
+  if (cur.length) chunks.push(cur);
+  chunks.forEach((c, ci) => {
+    const el = document.createElement("div"); el.className = "cap"; $("caps").appendChild(el);
+    const t0 = S[s] + c[0][1] - .05, t1 = ci + 1 < chunks.length ? S[s] + chunks[ci + 1][0][1] - .05 : Math.min(end, S[s] + c[c.length - 1][2] + .6);
+    A(el, t0, [{ opacity: 0, transform: "translateX(-50%) translateY(20px) scale(.92)" }, { opacity: 1, transform: "translateX(-50%) translateY(0) scale(1)", offset: Math.min(.2 / (t1 - t0), .5) }, { opacity: 1, transform: "translateX(-50%)", offset: .95 }, { opacity: 0, transform: "translateX(-50%)" }], t1 - t0, "ease-out", "none");
+    c.forEach((w, wi) => {
+      const sp = document.createElement("span"); sp.textContent = w[0]; el.appendChild(sp);
+      const a = S[s] + w[1], b = wi + 1 < c.length ? S[s] + c[wi + 1][1] : t1;
+      A(sp, a, [{ background: "var(--sky-400)", color: "var(--navy-900)" }, { background: "var(--sky-400)", color: "var(--navy-900)" }], Math.max(b - a, .05), "linear", "none");
+    });
+  });
+});
+</script>
 </body>
 </html>
